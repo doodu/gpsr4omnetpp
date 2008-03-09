@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for i in Simple*
+do
+echo $i
+sed 's/Simple\(NetwLayer\)/GPSR\1/g' $i
+sed 's/SIMPLE/GPSR/g' $i
+done
