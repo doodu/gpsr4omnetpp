@@ -1,0 +1,414 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- base href="http://vorlon.case.edu/~sxj63/EECS600-S05/Lecture0214.ppt" --><meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>GPSR: Greedy Perimeter Stateless Routing for Wireless Networks</title></head><body><table border="1" width="100%"><tbody><tr><td><table color="#ffffff" bgcolor="#ffffff" border="1" cellpadding="10" cellspacing="0" width="100%"><tbody><tr><td><font color="black" face="arial,sans-serif" size="-1">这是 <a href="http://vorlon.case.edu/%7Esxj63/EECS600-S05/Lecture0214.ppt"><font color="blue">http://vorlon.case.edu/~sxj63/EECS600-S05/Lecture0214.ppt</font></a> 的 HTML 档。<br> <b><font color="#0039b6">G</font> <font color="#c41200">o</font> <font color="#f3c518">o</font> <font color="#0039b6">g</font> <font color="#30a72f">l</font> <font color="#c41200">e</font></b> 在网路漫游时会自动将档案转换成 HTML 网页来储存。<br>请使用网址 <code>http://www.google.com/search?q=cache:jcd13u3kpI0J:vorlon.case.edu/~sxj63/EECS600-S05/Lecture0214.ppt+perimeter+forwarding&amp;hl=zh-CN&amp;ct=clnk&amp;cd=1&amp;gl=cn&amp;st_usg=ALhdy29zm7WAVsLNd0J5xrOX8LaNHMYezQ</code> 链接此页或将其做成书签。</font><br><br><center><font size="-1"><i>Google 和网页作者无关，不对网页的内容负责。</i></font></center></td></tr>
+<tr><td>
+<table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td><font color="black" face="arial,sans-serif" size="-1">这些搜索字词都已标明如下：&nbsp;</font></td><td bgcolor="#ffff66"><b><font color="black" face="arial,sans-serif" size="-1">perimeter&nbsp;</font></b></td><td bgcolor="#a0ffff"><b><font color="black" face="arial,sans-serif" size="-1">forwarding&nbsp;</font></b></td></tr></tbody></table>
+</td></tr></tbody></table></td></tr></tbody></table>
+<hr>
+<div style="position: relative;">
+
+
+
+
+
+
+
+&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="center"><font color="#333399" face="Arial" size="7"> GPSR: 
+Greedy <b style="color: black; background-color: rgb(255, 255, 102);">Perimeter</b> Stateless Routing for Wireless Networks</font>&nbsp;<br>
+</p>
+<p><font color="#003366" face="Arial" size="6">EECS 600 Advanced Network 
+Research, Spring 2005</font>&nbsp;<br></p>
+<p align="center"><font color="#003366" face="Arial" size="5">Shudong 
+Jin</font></p>
+<p align="center"><font color="#003366" face="Arial" size="5">February 
+14, 2005</font></p>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">2 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">Recall Last Lecture</font>&nbsp;<br>
+</p>
+<ul type="disc">
+  <li><font face="Arial" size="6">Dynamic Source Routing</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Who gives the path?</font></li>
+    <li><font face="Arial" size="6">How to obtain a path?</font></li>
+    <li><font face="Arial" size="6">What is the routing metric?</font></li>
+    <li><font face="Arial" size="6">What information is maintained?</font></li>
+</ul></ul>
+&nbsp;<br>
+<ul type="disc">
+  <li><font face="Arial" size="6">Different from Internet routing, 
+  but are there any similarities?</font></li>
+</ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">3 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">This Lecture: Another 
+Approach</font>&nbsp;<br></p>
+<ul type="disc">
+  <li><font face="Arial" size="6">Geographical Routing</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Who gives the path?</font></li>
+    <ul type="disc">
+      <li><font face="Arial" size="6">Routing is done locally 
+      by individual routers (hop-by-hop)</font></li>
+      </ul>
+    <li><font face="Arial" size="6">How to obtain a path?</font></li>
+    <ul type="disc">
+      <li><font face="Arial" size="6">Decided at the time of 
+      routing, no pre-computed full path</font></li>
+      </ul>
+    <li><font face="Arial" size="6">What is the routing metric?</font></li>
+    <ul type="disc">
+      <li><font face="Arial" size="6">Distance as the routing 
+      metric</font></li>
+      </ul>
+    <li><font face="Arial" size="6">What information is maintained?</font></li>
+    <ul type="disc">
+      <li><font face="Arial" size="6">A little local connectivity 
+      (and location) information is maintained by each router</font></li>
+</ul></ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">4 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">GPSR: Greedy <b style="color: black; background-color: rgb(255, 255, 102);">Perimeter</b> 
+Stateless Routing</font>&nbsp;<br></p>
+<ul type="disc">
+  <li><font face="Arial" size="6">Novel routing protocol for 
+  wireless datagram networks that uses the positions of routers and the 
+  destination to make packet <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> decisions.</font></li>
+  <ul type="disc">
+    <li><font color="#ff3300" face="Arial" size="6">Greedy <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b></font><font face="Arial" size="6"> used wherever possible and decisions made using 
+    only information about the router’s immediate neighbors.</font></li>
+    <li><font color="#ff3300" face="Arial" size="6"><b style="color: black; background-color: rgb(255, 255, 102);">Perimeter</b> 
+    <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b></font><font face="Arial" size="6"> used where Greedy <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> 
+    not possible i.e. algorithm recovers by routing around the <b style="color: black; background-color: rgb(255, 255, 102);">perimeter</b> 
+    of the region.</font></li>
+    <li><font color="#ff3300" face="Arial" size="6">Stateless</font><font face="Arial" size="6"> in that a router keeps state only about local 
+    topology, hence scales better as the number of destinations increases.</font></li>
+</ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">5 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">Greedy <b style="color: black; background-color: rgb(160, 255, 255);">Forwarding</b> </font>&nbsp;<br>
+</p>
+<ul type="disc">
+  <li><font color="#ff3300" face="Arial" size="6">Assumed</font><font face="Arial" size="6">: Packets are marked by the originator with their 
+  destination’s location.</font></li>
+  <li><font face="Arial" size="6">A <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> node can make 
+  a locally optimal, greedy choice in choosing a packet’s next hop.</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Most of the times the locally 
+    optimal choice is the neighbor closest to the packet’s destination. 
+    (how locally?)</font></li>
+    </ul>
+  <li><font color="#ff3300" face="Arial" size="6">The ideal 
+  case</font><font face="Arial" size="6">: The packet is successfully 
+  forwarded using closer geographic hops to reach the destination. </font></li>
+</ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">6 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">Greedy <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> example</font></p>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">7 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">How to Know the Positions?</font>&nbsp;<br>
+</p>
+<ul type="disc">
+  <li><font face="Arial" size="6">Periodically each node transmits 
+  a </font><font color="#ff3300" face="Arial" size="6">beacon</font><font face="Arial" size="6"> to the broadcast MAC address, containing its 
+  identifier (e.g. IP address ) and position.</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">X and Y co-ordinates are 
+    encoded by two 4-byte quantities.</font></li>
+    </ul>
+  <li><font face="Arial" size="6">Mean Beacon Transmission interval 
+  is uniformly distributed. 0.5B ~ 1.5B</font></li>
+  <li><font face="Arial" size="6">Upon not receiving a beacon 
+  for longer than the time out interval = 4.5B, a GPSR router assumes 
+  that either the neighbor has failed or has moved out; the GPSR router 
+  deletes that entry from its table.</font></li>
+</ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">8 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">More Optimizations on 
+Beaconing </font>&nbsp;<br></p>
+<ul type="disc">
+  <li><font face="Arial" size="6">Handling mobility</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Choice of beaconing interval 
+    to keep node’s neighbor tables current depend on the mobility in the 
+    network and range of node’s radios.</font></li>
+    </ul>
+  <li><font face="Arial" size="6">Reducing overhead</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Beaconing generates proactive 
+    traffic. To avoid this additional cost, GPSR piggybacks the local sending 
+    node's position on all data packets it forwards. Thus all packets serve 
+    as beacons.</font></li>
+    <ul type="disc">
+      <li><font color="#ff3300" face="Arial" size="6">Q</font><font face="Arial" size="6">: How to enforce random beacon interval, then?</font></li>
+</ul></ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">9 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">Greedy <b style="color: black; background-color: rgb(160, 255, 255);">Forwarding</b> May 
+Fail</font>&nbsp;<br></p>
+<ul><ul type="disc">
+    <li><font face="Arial" size="6">The Greedy <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> algorithm 
+    might fail in circumstances where the only route to a destination requires 
+    a packet to move temporarily away from the destination.</font></li>
+    <ul type="disc">
+      <li><font face="Arial" size="6">An example from the paper</font></li>
+      <li><font face="Arial" size="6">More knowledge on topology 
+      help?</font></li>
+</ul></ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">10 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">Perimeters</font>&nbsp;<br>
+</p>
+<ul type="disc">
+  <li><font face="Arial" size="6">When Greedy <b style="color: black; background-color: rgb(160, 255, 255);">Forwarding</b> fails, 
+  how can we get out of the situation?</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Right-hand rule to route 
+    around voids</font></li>
+</ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">11 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7"><b style="color: black; background-color: rgb(255, 255, 102);">Perimeter</b> <b style="color: black; background-color: rgb(160, 255, 255);">Forwarding</b></font>&nbsp;<br>
+</p>
+<ul type="disc">
+  <li><font face="Arial" size="6"><b style="color: black; background-color: rgb(255, 255, 102);">Perimeter</b> <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> makes 
+  use of Planarized graphs which are graphs in which there are no crossing 
+  edges.</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Why need the no-crossing 
+    heuristics? Give an example</font></li>
+    <li><font face="Arial" size="6">Two algorithms: RNG (Relative 
+    Neighborhood Graph) and GG (Gabriel Graph)</font></li>
+</ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">12 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">RNG (Relative Neighborhood 
+Graph)</font></p>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">13 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">GG (Gabriel Graph)</font></p>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">14 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">Planarized Graphs: Example</font>&nbsp;<br>
+</p>
+<p><font face="Arial" size="6">Full graph, the GG subset, the RNG subset.</font>&nbsp;<br>
+</p>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">15 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">GPSR</font>&nbsp;<br>
+</p>
+<ul type="disc">
+  <li><font face="Arial" size="6">This algorithm combines greedy 
+  <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> on the full network graph and <b style="color: black; background-color: rgb(255, 255, 102);">perimeter</b> <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> on the 
+  planarized graph.</font></li>
+  <li><font face="Arial" size="6">State information: All nodes 
+  maintain neighbor tables which store addresses of all radio-hop neighbors.</font></li>
+  <li><font face="Arial" size="6">Packet header fields</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">GPSR packet headers include 
+    a field which indicates whether the packet is currently in greedy mode 
+    or <b style="color: black; background-color: rgb(255, 255, 102);">perimeter</b> mode.</font></li>
+    <ul type="disc">
+      <li><font face="Arial" size="5">All data packets are marked 
+      originally as greedy mode.</font></li>
+      </ul>
+    <li><font face="Arial" size="6">Only the packet’s source 
+    sets the destination field.</font></li>
+</ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">16 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">GPSR Operations</font>&nbsp;<br>
+</p>
+<ul type="disc">
+  <li><font face="Arial" size="6">Upon receiving a greedy-mode 
+  packet</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">the node forwards it to 
+    the geographically closest neighbor if there is one.</font></li>
+    <li><font face="Arial" size="6">When no neighbor is closer, 
+    the node marks the packet to the <b style="color: black; background-color: rgb(255, 255, 102);">perimeter</b> mode. GPSR also records in 
+    the packet, the location <i>L</i><sub><i>p</i></sub>, the site where 
+    greedy <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> failed.</font></li>
+    <ul type="disc">
+      <li><font face="Arial" size="5">These <b style="color: black; background-color: rgb(255, 255, 102);">perimeter</b> mode packets 
+      are forwarded using Planar Graphs. </font></li>
+      </ul></ul>
+  <li><font face="Arial" size="6">Upon receiving a <b style="color: black; background-color: rgb(255, 255, 102);">perimeter</b> 
+  mode packet.</font></li>
+  <ul type="disc">
+    <li><font face="Arial" size="6">Forward the packet using a 
+    planar graph traversal. GPSR also compares the location <i>L</i><sub><i>p</i></sub> 
+    with the <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> node’s location. It then returns the packet to 
+    greedy mode if the distance from the <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> node to D is less than 
+    that from&nbsp; Lp to D.</font></li>
+    <li><font face="Arial" size="6"><b style="color: black; background-color: rgb(255, 255, 102);">Perimeter</b> <b style="color: black; background-color: rgb(160, 255, 255);">forwarding</b> is only 
+    intended to recover from local maximum.</font></li>
+</ul></ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">17 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">Simulation Results and 
+Evaluation</font>&nbsp;<br></p>
+<ul type="disc">
+  <li><font face="Arial" size="6">Packet delivery ratio</font></li>
+</ul>
+&nbsp;<br>
+<ul type="disc">
+  <li><font face="Arial" size="6">Routing protocol overhead</font></li>
+</ul>
+&nbsp;<br>
+<ul type="disc">
+  <li><font face="Arial" size="6">Path length</font></li>
+</ul>
+&nbsp;<br>
+<ul type="disc">
+  <li><font face="Arial" size="6">Effect of network diameter 
+  (size)</font></li>
+</ul>
+&nbsp;<br>
+<ul type="disc">
+  <li><font face="Arial" size="6">Number of states per router</font></li>
+</ul>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">18 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">More discussions</font></p>
+
+
+&nbsp;<br>&nbsp;<br>&nbsp;<br>
+<p align="center"><font color="#4d4d4d" face="Arial" size="3">EECS 600 
+Advanced Network Research, Spring 2005</font>&nbsp;<br></p>
+<p align="right"><font color="#4d4d4d" face="Arial" size="3">19 </font>&nbsp;<br>
+</p>
+<p><font color="#333399" face="Arial" size="7">GPSR Example</font></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div></body></html>

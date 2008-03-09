@@ -1,0 +1,6 @@
+(!stylesheet "tex2page.css")
+(!default-title "OMNeT++ \321\247\317\260\261\312\274\307")
+(!last-page-number 0)
+(!last-modification-time 1201535075)
+(!head-line "")
+(!foot-line "\\folio")

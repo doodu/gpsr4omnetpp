@@ -1,0 +1,96 @@
+\title{\urlh{usman.pdf}{OMNeT++用户手册}阅读笔记}
+
+\tableofcontents
+
+\section{简介}
+\subsection{什么是OMNeT++}
+面向对像的,模块化的,分布式的,事件仿真软件,可以用于:
+\enumerate
+\item 电子网络模拟
+\item 协议模拟
+\item 队列网络模拟
+\item 分布式硬件系统
+\item 验证硬件体系结构
+\item 计算复杂软件的质量
+\item ..其它任何分布式的事件系统
+\endenumerate
+
+\subsection{OMNeT++在仿真工具中的地位}
+下面的这些都是仿真软件:
+PARSEC,SMURPH,NS,Ptolemy,NetSim++,C++SIM,CLASS,OPNET,COMNET III,OMNeT++
+
+从七个方面比较:
+\enumerate
+\item 细节级别
+\item 可用的模型
+\item 定义网络拓扑结构
+\item 编程模型
+\item 对调试和跟踪的支持
+\item 软件本身的质量
+\item 是否开源
+\endenumerate
+
+\subsection{用户手册文档的组织}
+\enumerate
+\item 第1,2,3章是介绍性的
+\item 4-5章是编程向导
+\item 8-10章是讲如何编译运行以及如何分析结果,以及一些基本工具的使用
+\item 11章讲如何构建用于发行的可执行文件
+\item 12章OMNeT++内部的框架
+\item 附录A是NED语言的手册
+\endenumerate
+
+\subsection{历史}
+1992年开始于 Technical University of Budapest
+
+\subsection{作者}
+Adras Varga	BME-HIT		andras@whale.hit.bme,hu
+%--------------------------------------------
+\section{概述}
+
+\subsection{模型的基本概念}
+OMNeT++模块的基本特性
+\enumerate
+\item 分层,可嵌入
+\item 模块是模块类型的实现
+\item 模块之间通过在通道中传输消息来相互通信
+\item 灵活的参数
+\item 拓扑结构使用专门的描述语言
+\endenumerate
+
+\subsubsection{模块的层次结构}
+%include the picture
+最上层是系统模块,它又包含许多子模块\newline
+子模块也可以有子模块,包含了子模块的模块叫做组合模块\newline
+处于最底层的模块是:simple modules,它是由用户来实现的.
+\subsubsection{模块类型}
+\subsubsection{消息,门,连接}
+发给自己的消息可以用来实现定时器\newline
+门是模块输入和输出的接口,消息通过输出门发送,通过输入门接收\newline
+连接分几种类型
+\enumerate
+\item 子模块->子模块
+\item 子模块->父模块
+\item 简单模块->简单模块(路由)
+\endenumerate
+\subsubsection{包传输}
+每个连接可赋予三个参数用于模拟真实网络
+\enumerate
+\item 传输延迟
+\item 误传率
+\item 传输速率
+\endenumerate
+\subsubsection{参数}
+模块的参数用于三个目的:
+\enumerate
+\item　参数化网络拓扑结构
+\item 个性化模块的表现
+\item 用于模块间的通信，就像共享变量
+\endenumerate
+\subsubsection{定义网络拓扑结构的方法}
+使用一种名叫NED的语言
+
+\subsection{算法}
+
+\subsection{如何使用OMNeT++}
+\bye

@@ -1,0 +1,204 @@
+<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+
+Generated from omnet++manual.txt by tex2page, v 20070803
+(running on MzScheme 209, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+-->
+<head>
+<title>
+OMNeT++用户手册阅读笔记
+</title>
+<link rel="stylesheet" type="text/css" href="omnet++manual-Z-S.css" title=default>
+<meta name=robots content="index,follow">
+</head>
+<body>
+<div id=slidetitle>
+<div align=right class=navigation></div>
+<p></p>
+<h1 class=title><a href="usman.pdf">OMNeT++用户手册</a>阅读笔记</h1>
+<p>
+<a name="node_toc_start"></a></p>
+
+<p class=noindent></p>
+<p></p>
+
+<p class=noindent><b>
+&nbsp; &nbsp; <a name="node_toc_node_sec_1"></a><a href="#node_sec_1">1&nbsp;&nbsp;简介</a></b><br>
+&nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_1.1"></a><a href="#node_sec_1.1">1.1&nbsp;&nbsp;什么是OMNeT++</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_1.2"></a><a href="#node_sec_1.2">1.2&nbsp;&nbsp;OMNeT++在仿真工具中的地位</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_1.3"></a><a href="#node_sec_1.3">1.3&nbsp;&nbsp;用户手册文档的组织</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_1.4"></a><a href="#node_sec_1.4">1.4&nbsp;&nbsp;历史</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_1.5"></a><a href="#node_sec_1.5">1.5&nbsp;&nbsp;作者</a><br>
+</p>
+<p></p>
+
+<p class=noindent><b>
+&nbsp; &nbsp; <a name="node_toc_node_sec_2"></a><a href="#node_sec_2">2&nbsp;&nbsp;概述</a></b><br>
+&nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_2.1"></a><a href="#node_sec_2.1">2.1&nbsp;&nbsp;模型的基本概念</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_2.1.1"></a><a href="#node_sec_2.1.1">2.1.1&nbsp;&nbsp;模块的层次结构</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_2.1.2"></a><a href="#node_sec_2.1.2">2.1.2&nbsp;&nbsp;模块类型</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_2.1.3"></a><a href="#node_sec_2.1.3">2.1.3&nbsp;&nbsp;消息,门,连接</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_2.1.4"></a><a href="#node_sec_2.1.4">2.1.4&nbsp;&nbsp;包传输</a><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a name="node_toc_node_sec_2.1.5"></a><a href="#node_sec_2.1.5">2.1.5&nbsp;&nbsp;参数</a><br>
+</p>
+<p>
+</p>
+<a name="node_sec_1"></a>
+<h1 class=section><a href="#node_toc_node_sec_1">1&nbsp;&nbsp;简介</a></h1>
+<p></p>
+<a name="node_sec_1.1"></a>
+<h2 class=section><a href="#node_toc_node_sec_1.1">1.1&nbsp;&nbsp;什么是OMNeT++</a></h2>
+<p>面向对像的,模块化的,分布式的,事件仿真软件,可以用于:
+</p>
+<ol><li><p>电子网络模拟
+</p>
+<li><p>协议模拟
+</p>
+<li><p>队列网络模拟
+</p>
+<li><p>分布式硬件系统
+</p>
+<li><p>验证硬件体系结构
+</p>
+<li><p>计算复杂软件的质量
+</p>
+<li><p>..其它任何分布式的事件系统
+</p>
+</ol><p></p>
+<p>
+</p>
+<a name="node_sec_1.2"></a>
+<h2 class=section><a href="#node_toc_node_sec_1.2">1.2&nbsp;&nbsp;OMNeT++在仿真工具中的地位</a></h2>
+<p>下面的这些都是仿真软件:
+PARSEC,SMURPH,NS,Ptolemy,NetSim++,C++SIM,CLASS,OPNET,COMNET III,OMNeT++</p>
+<p>
+从七个方面比较:
+</p>
+<ol><li><p>细节级别
+</p>
+<li><p>可用的模型
+</p>
+<li><p>定义网络拓扑结构
+</p>
+<li><p>编程模型
+</p>
+<li><p>对调试和跟踪的支持
+</p>
+<li><p>软件本身的质量
+</p>
+<li><p>是否开源
+</p>
+</ol><p></p>
+<p>
+</p>
+<a name="node_sec_1.3"></a>
+<h2 class=section><a href="#node_toc_node_sec_1.3">1.3&nbsp;&nbsp;用户手册文档的组织</a></h2>
+<p></p>
+<ol><li><p>第1,2,3章是介绍性的
+</p>
+<li><p>4-5章是编程向导
+</p>
+<li><p>8-10章是讲如何编译运行以及如何分析结果,以及一些基本工具的使用
+</p>
+<li><p>11章讲如何构建用于发行的可执行文件
+</p>
+<li><p>12章OMNeT++内部的框架
+</p>
+<li><p>附录A是NED语言的手册
+</p>
+</ol><p></p>
+<p>
+</p>
+<a name="node_sec_1.4"></a>
+<h2 class=section><a href="#node_toc_node_sec_1.4">1.4&nbsp;&nbsp;历史</a></h2>
+<p>1992年开始于 Technical University of Budapest</p>
+<p>
+</p>
+<a name="node_sec_1.5"></a>
+<h2 class=section><a href="#node_toc_node_sec_1.5">1.5&nbsp;&nbsp;作者</a></h2>
+<p>Adras Varga&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BME-HIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;andras@whale.hit.bme,hu
+</p>
+<a name="node_sec_2"></a>
+<h1 class=section><a href="#node_toc_node_sec_2">2&nbsp;&nbsp;概述</a></h1>
+<p></p>
+<a name="node_sec_2.1"></a>
+<h2 class=section><a href="#node_toc_node_sec_2.1">2.1&nbsp;&nbsp;模型的基本概念</a></h2>
+<p>OMNeT++模块的基本特性
+</p>
+<ol><li><p>分层,可嵌入
+</p>
+<li><p>模块是模块类型的实现
+</p>
+<li><p>模块之间通过在通道中传输消息来相互通信
+</p>
+<li><p>灵活的参数
+</p>
+<li><p>拓扑结构使用专门的描述语言
+</p>
+</ol><p></p>
+<p>
+</p>
+<a name="node_sec_2.1.1"></a>
+<h3 class=section><a href="#node_toc_node_sec_2.1.1">2.1.1&nbsp;&nbsp;模块的层次结构</a></h3>
+<p>最上层是系统模块,它又包含许多子模块<br>子模块也可以有子模块,包含了子模块的模块叫做组合模块<br>处于最底层的模块是:simple modules,它是由用户来实现的.
+</p>
+<a name="node_sec_2.1.2"></a>
+<h3 class=section><a href="#node_toc_node_sec_2.1.2">2.1.2&nbsp;&nbsp;模块类型</a></h3>
+<p></p>
+<a name="node_sec_2.1.3"></a>
+<h3 class=section><a href="#node_toc_node_sec_2.1.3">2.1.3&nbsp;&nbsp;消息,门,连接</a></h3>
+<p>发给自己的消息可以用来实现定时器<br>门是模块输入和输出的接口,消息通过输出门发送,通过输入门接收<br>连接分几种类型
+</p>
+<ol><li><p>子模块-&gt;子模块
+</p>
+<li><p>子模块-&gt;父模块
+</p>
+<li><p>简单模块-&gt;简单模块(路由)
+</p>
+</ol><p></p>
+<a name="node_sec_2.1.4"></a>
+<h3 class=section><a href="#node_toc_node_sec_2.1.4">2.1.4&nbsp;&nbsp;包传输</a></h3>
+<p>每个连接可赋予三个参数用于模拟真实网络
+</p>
+<ol><li><p>传输延迟
+</p>
+<li><p>误传率
+</p>
+<li><p>传输速率
+</p>
+</ol><p></p>
+<a name="node_sec_2.1.5"></a>
+<h3 class=section><a href="#node_toc_node_sec_2.1.5">2.1.5&nbsp;&nbsp;参数</a></h3>
+<p>模块的参数用于三个目的:
+</p>
+<ol><li><p>　参数化网络拓扑结构
+</p>
+<li><p>个性化模块的表现
+</p>
+<li><p>用于模块间的通信，就像共享变量
+</p>
+</ol><p></p>
+<a name="node_sec_2.1.6"></a>
+<h3 class=section><a href="#node_toc_node_sec_2.1.6">2.1.6&nbsp;&nbsp;定义网络拓扑结构的方法</a></h3>
+<p>使用一名叫NED的语言</p>
+<p>
+</p>
+<a name="node_sec_2.2"></a>
+<h2 class=section><a href="#node_toc_node_sec_2.2">2.2&nbsp;&nbsp;算法</a></h2>
+<p></p>
+<a name="node_sec_2.3"></a>
+<h2 class=section><a href="#node_toc_node_sec_2.3">2.3&nbsp;&nbsp;如何使用OMNeT++</a></h2>
+<p></p>
+<div class=smallskip></div>
+<p style="margin-top: 0pt; margin-bottom: 0pt">
+<div align=right class=navigation></div>
+</p>
+<p></p>
+<div align=right class=colophon>Last modified: Thursday, January 17th, 2008 7:54:36pm<br><div align=right class=advertisement>HTML conversion by <a href="http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html">TeX2page 20070803</a></div></div>
+</div>
+</body>
+</html>
