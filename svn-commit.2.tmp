@@ -1,0 +1,32 @@
+
+--This line, and those below, will be ignored--
+
+D    BlueqApplLayer.o
+D    GPSRNetwLayer_n.o
+D    Host.ned~
+D    NetwPkt_m.obj
+D    BlueqApplLayer_n.cc
+D    Host_n.o
+D    GPSRNetwLayer.cc~
+D    802.11
+D    GPSRPkt_m.cc
+D    GPSRNetwLayer.h~
+D    Network_n.cc
+D    change_name.sh~
+D    GPSRPkt_m.h
+D    BlueqApplLayer_n.o
+D    NetwPkt_m.cc
+D    omnetpp.ini~
+D    802.11.lib
+D    NetwPkt_m.h
+D    GPSRPkt_m.o
+D    GPSRNetwLayer.o
+D    Network_n.o
+D    BlueqApplLayer.cc~
+D    NetwPkt_m.o
+D    BlueqApplLayer.h~
+D    GPSRNetwLayer_n.cc
+D    GPSRNetwLayer.ned~
+D    Makefile~
+D    GPSRPkt.msg~
+D    Host_n.cc
