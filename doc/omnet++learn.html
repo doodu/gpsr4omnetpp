@@ -1,0 +1,194 @@
+<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+
+Generated from omnet++learn.tex by tex2page, v 20070803
+(running on MzScheme 209, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+-->
+<head>
+<title>
+OMNeT++ 学习笔记
+</title>
+<link rel="stylesheet" type="text/css" href="omnet++learn-Z-S.css" title=default>
+<link rel="stylesheet" type="text/css" href="tex2page.css" title=default>
+<meta name=robots content="index,follow">
+</head>
+<body>
+<div id=slidetitle>
+<div align=right class=navigation></div>
+<p></p>
+<p>
+</p>
+<h1 class=title>OMNeT++ 学习笔记</h1>
+<p>
+入门文档:OMNeT++ Tutorial
+用户手册:OMNeT++ User Manual</p>
+<p>
+这两个文档OMNeT++自带</p>
+<p>
+从一个例子入门:</p>
+<p>
+目录为:c:/blueq/bin/OMNeT++/tutorial/queues</p>
+<p>
+介绍这个例子的文档为:C:/blueq/bin/OMNeT++/tutorial/tutorial.pdf</p>
+<p>
+OMNeT++下载地址:http://whale.hit.bme.hu/omnetpp/</p>
+<p>
+</p>
+<a name="node_sec_1"></a>
+<h1 class=section>1&nbsp;&nbsp;如何编译?(Windows平台下)</h1>
+<p>1.生成Makefile:
+</p>
+<pre class=verbatim>cd c:/blueq/bin/OMNeT++&nbsp;
+cd ./tutorial/queues&nbsp;
+opp_nmakemake -f&nbsp;
+</pre><p>
+2.编译
+</p>
+<pre class=verbatim>nmake&nbsp;
+</pre><p>
+3.运行
+</p>
+<pre class=verbatim>queues.exe&nbsp;
+</pre><p>
+程序启动后会有两个窗口:
+一个图形窗口,用于显示网络
+另一个窗口名叫OMNeT++/TKenv,是主窗口
+4.分析模拟结果
+两个文件保存了结果:</p>
+<p>
+fifo.sca:</p>
+<p>
+fifo.vec:这个文件包含了系统中的任务数量的动态变化,用户手册的第九章有相关介绍</p>
+<p>
+OMNeT++提供多种方式对仿真数据进行处理:
+</p>
+<ol><li><p>动态的
+</p>
+<li><p>图形的
+</p>
+<li><p>verbally
+</p>
+<li><p>文件
+</p>
+</ol><p></p>
+<p>
+</p>
+<a name="node_sec_2"></a>
+<h1 class=section>2&nbsp;&nbsp;修改这个例子</h1>
+<p></p>
+<ol><li><p>改变仿真器:修改参数文件omnetpp.ini,用户手册的第八章有介绍
+</p>
+<li><p>Changing the Interarrival and Service Rate:
+</p>
+<li><p>Changing the Interarrival and Service Distribution:
+</p>
+<li><p>改变网络:
+</p>
+<li><p>改变任务调度:
+</p>
+<li><p>改变随机数生成器:用户手册6.9
+</p>
+<li><p>加快仿真速度
+</p>
+</ol><p>使用cmdenv模式,具体方法如下:
+改变Makefile
+</p>
+<pre class=verbatim>#User interface (uncomment one) (-u option)&nbsp;
+#USERIF\_LIBS=\$(CMDENV\_LIBS)&nbsp;
+USERIF\_LIBS=\$(TKENV\_LIBS)&nbsp;
+</pre><p>
+为
+</p>
+<pre class=verbatim>#User interface (uncomment ont) (-u option)&nbsp;
+USERIF\_LIBS=\$(CMDENV\_LIBS)&nbsp;
+#USERIF\_LIBS=\$(TKENV\_LIBS)&nbsp;
+</pre><p>
+运行
+</p>
+<pre class=verbatim>make clean &amp;&amp; make&nbsp;
+</pre><p></p>
+<p>
+你要在omnetpp.ini中设置下面的变量:
+</p>
+<pre class=verbatim>[Cmdenv]&nbsp;
+runs-to-execute = 1&nbsp;
+mofule-messages = no&nbsp;
+verbose-simulation = no&nbsp;
+Display-update = 1h&nbsp;
+</pre><p>
+关于这些变量请看用户手册8.5</p>
+<p>
+关于如何提高仿真速度请看用户手册6.18 &amp;&amp; 8.7</p>
+<p>
+</p>
+<a name="node_sec_3"></a>
+<h1 class=section>3&nbsp;&nbsp;M/M/1模拟器的实现</h1>
+<p>理解代码的一个简单的方法:
+</p>
+<ol><li><p>运行,理解它是如何运作的
+</p>
+<li><p>看.ned文件
+</p>
+<li><p>看.h文件
+</p>
+<li><p>看.cc文件
+</p>
+</ol><p></p>
+<p>
+</p>
+<ol><li><p>功能实体(functional entiy):模拟器的一部分,在任务中xie带一个特定的动作或者消息.
+</p>
+<li><p>模块(modules):功能实体的实现.
+</p>
+<li><p>模拟的环境主要由两种文件构建,.ned文件和.cc文件:
+</p>
+<li><p>.ned文件:描述各个功能实体之间如何连接以及如何通信的
+</p>
+<li><p>.cc文件:包含了实体的实现代码
+</p>
+</ol><p></p>
+<p>
+</p>
+<a name="node_sec_4"></a>
+<h1 class=section>4&nbsp;&nbsp;为什么使用OMNeT++</h1>
+<p></p>
+<ol><li><p>它的开发语言是c++
+</p>
+<li><p>它是开源的
+</p>
+<li><p>具有良好的可扩展性
+</p>
+<li><p>它使用GPL license
+</p>
+<li><p>它强制各个模块相互分离,这正是网络拓扑结构所要求的
+</p>
+</ol><p></p>
+<p>
+</p>
+<a name="node_sec_5"></a>
+<h1 class=section>5&nbsp;&nbsp;资源</h1>
+<p></p>
+<ol><li><p><a href="http://mobility-fw.sourceforge.net/hp/index.html">Mobility Framework for OMNeT++</a>:移动通信的仿真框架
+</p>
+<li><p><a href="http://wwwes.cs.utwente.nl/ewsnsim/download/">EYES WSN Simulation Framework</a>:用于通信的仿真框架
+</p>
+<li><p><a href="http://nesct.sourceforge.net/">NesCT: A language translator</a>:TinyOS所支持的一种编程语言,类似c语言
+</p>
+<li><p><a href="http://www.tinyos.net">TinyOS</a>:一个用于无线传感网络的小操作系统
+</p>
+</ol><p></p>
+<p>
+</p>
+<div class=smallskip></div>
+<p style="margin-top: 0pt; margin-bottom: 0pt">
+<div align=right class=navigation></div>
+</p>
+<p></p>
+<div align=right class=colophon>Last modified: Monday, January 28th, 2008 11:44:35pm<br><div align=right class=advertisement>HTML conversion by <a href="http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html">TeX2page 20070803</a></div></div>
+</div>
+</body>
+</html>

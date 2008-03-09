@@ -1,0 +1,89 @@
+入门文档:OMNeT++ Tutorial
+用户手册:OMNeT++ User Manual
+
+这两个文档OMNeT++自带
+
+-------------------
+从一个例子入门:
+目录为:c:/blueq/bin/OMNeT++/tutorial/queues
+介绍这个例子的文档为:C:/blueq/bin/OMNeT++/tutorial/tutorial.pdf
+OMNeT++下载地址:http://whale.hit.bme.hu/omnetpp/
+
+如何编译?(Windows平台下)
+1.生成Makefile:
+cd c:/blueq/bin/OMNeT++
+cd ./tutorial/queues
+opp_nmakemake -f
+2.编译
+nmake
+3.运行
+queues.exe
+程序启动后会有两个窗口:
+一个图形窗口,用于显示网络
+另一个窗口名叫OMNeT++/TKenv,是主窗口
+4.分析模拟结果
+两个文件保存了结果:
+fifo.sca:
+fifo.vec:这个文件包含了系统中的任务数量的动态变化,用户手册的第九章有相关介绍
+
+OMNeT++提供多种方式对仿真数据进行处理:
+1.动态的
+2.图形的
+3.verbally
+4.文件
+
+修改这个例子
+--------------------
+1.改变仿真器:修改参数文件omnetpp.ini,用户手册的第八章有介绍
+2.Changing the Interarrival and Service Rate:
+3.Changing the Interarrival and Service Distribution:
+4.改变网络:
+5.改变任务调度:
+6.改变随机数生成器:用户手册6.9
+7.加快仿真速度
+使用cmdenv模式,具体方法如下:
+改变Makefile
+#User interface (uncomment one) (-u option)
+#USERIF\_LIBS=\$(CMDENV\_LIBS)
+USERIF\_LIBS=\$(TKENV\_LIBS)
+
+为
+
+#User interface (uncomment ont) (-u option)
+USERIF\_LIBS=\$(CMDENV\_LIBS)
+#USERIF\_LIBS=\$(TKENV\_LIBS)
+
+运行make clean && make
+你要在omnetpp.ini中设置下面的变量:
+[Cmdenv]
+runs-to-execute = 1
+mofule-messages = no
+verbose-simulation = no
+Display-update = 1h
+关于这些变量请看用户手册8.5
+
+关于如何提高仿真速度请看用户手册6.18 && 8.7
+
+M/M/1模拟器的实现
+---------------------
+理解代码的一个简单的方法:
+1.运行,理解它是如何运作的
+2.看.ned文件
+3.看.h文件
+4.看.cc文件
+
+功能实体(functional entiy):模拟器的一部分,在任务中xie带一个特定的动作或者消息.
+模块(modules):功能实体的实现.
+模拟的环境主要由两种文件构建,.ned文件和.cc文件:
+.ned文件:描述各个功能实体之间如何连接以及如何通信的
+.cc文件:包含了实体的实现代码
+
+
+为什么使用OMNeT++
+---------------------
+1.它的开发语言是c++
+2.它是开源的
+3.具有良好的可扩展性
+4.它使用GPL license
+5.它强制各个模块相互分离,这正是网络拓扑结构所要求的
+

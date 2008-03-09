@@ -1,0 +1,75 @@
+\inputcss tex2page.css
+
+\title{mf learning note}
+
+\section{概要}
+\enumerate
+\item The ChannelControl module controls and maintains all potential connections between the hosts
+\item the core MF does not provide any protocol implementations
+\endenumerate
+
+如何使用？
+\enumerate
+\item 把它当作库使用
+\item 使用它提供的模板
+\item 使用它提供的一些协议
+\endenumerate
+
+目录结构
+\verb{
+mobility-fw/ 	 root directory
+bitmaps/ 	icons for network graphics
+core/ 	the core of the framework
+basicMessages/ 	the basic message classes
+basicModules/ 	all basic module classes
+basicNetworks/ 	2 basic sample networks
+blackboard/ 	Blackboard stuff
+channelcontrol/ 	ChannelControl modules
+utils/ 	utilities
+development/ 	experimental protocol implementations
+applLayer/ 	application layer modules
+messages/ 	all .msg files
+mobility/ 	Mobility modules
+netwLayer/ 	network layer modules
+nic/ 	network interface modules
+macLayer/ 	MAC layer modules
+phyLayer/ 	physical layer modules
+decider/ 	decider modules
+snrEval/ 	snr evaluation modules
+utils/ 	utilities
+doc/ 	manual, API, neddoc...
+include/ 	header and .ned includes
+lib/ 	dir of the libmobilityfw.so
+networks/ 	example networks
+protocols/ 	tested protocol implementations
+template/ 	templates to create own modules
+testSuite/ 	regression test suite
+}
+
+\section{使用mf}
+\subsection{安装mf}
+需要OMNeT++ version 3.0a8或者更高版本
+\enumerate
+\item tar -xzf mobility-fw-version.tgz
+\item Add  your/path/to/mobility-fw-version/lib
+      to your LD_LIBRARY_PATH variable
+\item cd mobility-fw-version/
+\item make install
+\item  make
+\endenumerate
+
+\subsection{创建自己的网络}
+为了更简单的创建自己的网络可以使用现有的模板，模板文件在tmplate/目录下
+\enumerate
+\item 创建一个自己的目录如yourNetwork,拷贝下面几个文件到这个目录YourNetwork.ned,YourHost.ned，Makefile.gen如果使用了自己的模块，要把模块文件也拷贝过来
+\item 把Makefile.gen中的环境变量MOBFW设成MF的根目录
+\item 修改YourHost.ned文件
+\item 运行 make -f Makefile.gen 生成一个 Makefile，然后再运行make
+\endenumerate
+
+
+\subsection{创建一个新的模块}
+\enumerate
+\item 
+\endenumerate
+\end
