@@ -38,9 +38,17 @@ message GPSRPkt
 	int ttl              =  1; // time to live field (IP)
 	unsigned long seqNum =  0; // sequence number
 
-	//for routing
-	int savedx;
-	int savedy;	// the position can not do greedy forwarding
-	int dstx;
-	int dsty;	//目标的坐标
+		 //for routing
+		 int lpx;
+		 int lpy;	//贪婪路由失效的节点坐标
+		 int lfx;
+		 int lfy;
+
+		 int dstx;
+		 int dsty;	//目标的坐标
+		 int srcx;
+		 int srcy;	//源的坐标
+		 int e0vectex1;
+		 int e0vectex2;	//第一条边
+		 int mode;
 }
