@@ -139,3 +139,4 @@ re-makemake-m: makefile-ins
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 Host_n.o: Host_n.cc
 Network_n.o: Network_n.cc
+GPSRPkt_m.o: GPSRPkt.msg

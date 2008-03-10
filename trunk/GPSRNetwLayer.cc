@@ -96,11 +96,12 @@ void GPSRNetwLayer::sendBeacon()
   GPSRPkt *pkt = new GPSRPkt("BEACON_MESSAGE",BEACON_MESSAGE);
 
   pkt->setLength(headerLength);
+  EV << "headerLength:"<<headerLength<<endl;
 
   pkt->setSrcAddr(myNetwAddr);
   pkt->setDestAddr(-1);
-  pkt->setSavedx(x);
-  pkt->setSavedy(y);
+  pkt->setSrcx(x);
+  pkt->setSrcy(y);
   pkt->setControlInfo( new MacControlInfo(L2BROADCAST));
   pkt->encapsulate(msg);
   sendDown(pkt);
@@ -116,7 +117,7 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
 
   EV <<"in encaps...\n";
 
-  GPSRPkt *pkt = new GPSRPkt(msg->name(), msg->kind());
+  GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
   pkt->setLength(headerLength);
     
   NetwControlInfo* cInfo = dynamic_cast<NetwControlInfo*>(msg->removeControlInfo());
@@ -183,8 +184,8 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
     int x,y;
     int addr;
     addr = m->getSrcAddr();
-    x = m->getSavedx();
-    y = m->getSavedy();	// 获得坐标
+    x = m->getSrcx();
+    y = m->getSrcy();	// 获得坐标
 
     bool find = false;
 
