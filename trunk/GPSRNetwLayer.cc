@@ -32,6 +32,10 @@ nn *
 #define PING_FANG(x) (x)*(x)
 #define DISTANCE(x1,y1,x2,y2) PING_FANG((x1) - (x2)) + PING_FANG((y1) - (y2))
 
+#define ADDR(x,y) ((x) << 16 | ((y)&0x0000ffff))
+#define GETX(addr) ((addr)>>16)
+#define GETY(addr) ((addr) & 0x0000ffff)
+
 using namespace std;
 
 Define_Module(GPSRNetwLayer);
@@ -57,7 +61,7 @@ void GPSRNetwLayer::initialize(int stage)
   else if(stage==1){
     headerLength= par("headerLength");
     arp = SimpleArpAccess().get();
-    myNetwAddr = this->id();
+    myNetwAddr = ADDR(x,y);
     EV << " myNetwAddr " << myNetwAddr << endl;
     
     scheduleAt(simTime() + dblrand()*beaconDelay, beaconTimer); // timer to send beacon
@@ -100,8 +104,6 @@ void GPSRNetwLayer::sendBeacon()
 
   pkt->setSrcAddr(myNetwAddr);
   pkt->setDestAddr(-1);
-  pkt->setSrcx(x);
-  pkt->setSrcy(y);
   pkt->setControlInfo( new MacControlInfo(L2BROADCAST));
   pkt->encapsulate(msg);
   sendDown(pkt);
@@ -146,8 +148,8 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
     // 在这里路由
     int nextHopAddr; 
     int destx,desty;
-    destx = pkt->getDstx();
-    desty = pkt->getDsty();
+    destx = GETX(netwAddr);
+    desty = GETY(netwAddr);
 
     nextHopAddr = greedyForwarding(destx,desty);
     if(nextHopAddr != myNetwAddr){
@@ -184,8 +186,6 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
     int x,y;
     int addr;
     addr = m->getSrcAddr();
-    x = m->getSrcx();
-    y = m->getSrcy();	// 获得坐标
 
     bool find = false;
 
