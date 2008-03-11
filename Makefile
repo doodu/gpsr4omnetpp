@@ -99,6 +99,9 @@ GPSRPkt_m.o: GPSRPkt_m.cc
 GPSRPkt_m.cc GPSRPkt_m.h: GPSRPkt.msg
 	$(MSGC) $(MSGCOPTS) $<
 
+GPSRNetwLayer.o: GPSRPkt_m.h
+GPSRPkt_m.o: GPSRPkt.msg
+
 #doc: neddoc doxy
 
 #neddoc:
@@ -138,5 +141,4 @@ re-makemake-m: makefile-ins
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 Host_n.o: Host_n.cc
-Network_n.o: Network_n.cc
-GPSRPkt_m.o: GPSRPkt.msg
+Network_n.o: Network_n.cc 
