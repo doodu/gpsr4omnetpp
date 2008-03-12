@@ -104,8 +104,8 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 
 void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 {
-  GpsrPkt *pkt;
-  pkt = static_cast<GpsrPkt *>(msg);
+  GPSRPkt *pkt;
+  pkt = static_cast<GPSRPkt *>(msg);
   switch(msg->kind()){
 
   case BROADCAST_MESSAGE:{
@@ -119,8 +119,9 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 
   case BEACON_MESSAGE:{
     int addr = pkt->getSrcAddr();
-    int x = pkt->getX();
-    int y = pkt->getY();
+    //    int  x = pkt->getX();
+    //     int y = pkt->getY();
+    int x,y;
 
     bool find = false;
 
@@ -159,8 +160,8 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
  **/
 void BlueqApplLayer::sendBroadcast()
 {
-    GpsrPkt *pkt = new GpsrPkt("BROADCAST_MESSAGE", BROADCAST_MESSAGE);
-    pkt->setNextHopAddr(-1);	// 下一跳的地址是所有的neighbors
+    GPSRPkt *pkt = new GPSRPkt("BROADCAST_MESSAGE", BROADCAST_MESSAGE);
+    //   pkt->setNextHopAddr(-1);	// 下一跳的地址是所有的neighbors
     // we use the host modules index() as a appl address
     pkt->setSrcAddr( myApplAddr() );
     pkt->setLength(headerLength);
@@ -173,8 +174,8 @@ void BlueqApplLayer::sendBroadcast()
 }
 void BlueqApplLayer::sendBeacon()
 {
-  GpsrPkt *pkt = new GpsrPkt("BEACON_MESSAGE",BEACON_MESSAGE);
-
+  GPSRPkt *pkt = new GPSRPkt("BEACON_MESSAGE",BEACON_MESSAGE);
+  /*
   pkt->setNextHopAddr(-1);	// 广播
 
   pkt->setSrcAddr( myApplAddr());
@@ -185,16 +186,17 @@ void BlueqApplLayer::sendBeacon()
   pkt->setY(y);
 
   pkt->setControlInfo( new NetwControlInfo(L3BROADCAST));
+  */
   sendDown(pkt);
 
 }
 
-void BlueqApplLayer::sendReply(GpsrPkt *msg) 
+void BlueqApplLayer::sendReply(GPSRPkt *msg) 
 {
     double delay;
 
     delay = uniform(0, 0.01);
-
+    /*
     msg->setNextHopAddr(msg->getSrcAddr());
     msg->setSrcAddr(myApplAddr());
     msg->setKind(BROADCAST_REPLY_MESSAGE);
@@ -202,6 +204,7 @@ void BlueqApplLayer::sendReply(GpsrPkt *msg)
     sendDelayedDown(msg, delay);
     //NOTE: the NetwControl info was already ste by the network layer
     //and stays the same
+    */
 }
 
 void BlueqApplLayer::finish() 
