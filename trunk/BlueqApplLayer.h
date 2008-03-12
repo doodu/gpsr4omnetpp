@@ -23,7 +23,7 @@
 #ifndef BLUEQ_APPL_LAYER_H
 #define BLUEQ_APPL_LAYER_H
 
-#include "GpsrPkt_m.h"
+#include "GPSRPkt_m.h"
 #include "BasicApplLayer.h"
 #include <list>
 /**
@@ -97,7 +97,7 @@ protected:
   /** @brief send a beacon packet to all connected neighbors */
   void sendBeacon();
   /** @brief send a reply to a broadcast message */
-  void sendReply(GpsrPkt *msg); 
+  void sendReply(GPSRPkt *msg); 
 };
 
 #endif

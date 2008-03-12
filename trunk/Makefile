@@ -39,8 +39,8 @@ MSGCOPTS= $(INCLUDE_PATH)
 SUBDIRS= 
 
 # object files in this directory
-OBJS= Host_n.o Network_n.o  BlueqApplLayer_n.o BlueqApplLayer.o\
-	 GPSRNetwLayer.o GPSRNetwLayer_n.o GPSRPkt_m.o
+OBJS= GPSRPkt_m.o Host_n.o Network_n.o  BlueqApplLayer_n.o BlueqApplLayer.o\
+	 GPSRNetwLayer.o GPSRNetwLayer_n.o
 
 # header files generated (from msg files)
 GENERATEDHEADERS= 
@@ -100,6 +100,7 @@ GPSRPkt_m.cc GPSRPkt_m.h: GPSRPkt.msg
 	$(MSGC) $(MSGCOPTS) $<
 
 GPSRNetwLayer.o: GPSRPkt_m.h
+BlueqApplLayer.o: GPSRPkt_m.h
 GPSRPkt_m.o: GPSRPkt.msg
 
 #doc: neddoc doxy
