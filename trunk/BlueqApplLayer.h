@@ -55,7 +55,7 @@ class BlueqApplLayer : public BasicApplLayer
   /** @brief Initialite module parameters*/
   virtual void initialize(int);
   virtual void finish();
-    enum GPSR_MSG_TYPES{
+    enum APPL_MSG_TYPES{
 	SEND_BROADCAST_TIMER,
 	BROADCAST_MESSAGE,
 	BROADCAST_REPLY_MESSAGE,
@@ -66,11 +66,6 @@ class BlueqApplLayer : public BasicApplLayer
 	BEACON_MESSAGE, // for location 
 	DATA_MESSAGE		  // for data
     }; 
-
-  enum DATA_MSG_MODE{
-    GREEDY_MODE,		// greedy forwarding
-    PERIMETER_MODE		// perimeter forwarding
-  };
 protected:
 
   // routing
@@ -98,6 +93,9 @@ protected:
   void sendBeacon();
   /** @brief send a reply to a broadcast message */
   void sendReply(GPSRPkt *msg); 
+
+  /** @brief send message to the node which located at x,y*/
+  void sendToXY(cMessage* msg, int x, int y);
 };
 
 #endif
