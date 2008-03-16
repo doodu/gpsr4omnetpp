@@ -44,10 +44,10 @@ message GPSRPkt
 	unsigned long seqNum =  0; // sequence number
 
 		 //for routing
-		 int lpAddr;//贪婪路由失效的节点坐标
-		 int lfAddr;
+	 int lpAddr;	// the address where greedy forwarding failed 
+	 int lfAddr;
 
-		 int e0vectex1;
-		 int e0vectex2;	//第一条边
-		 int mode;
+	 int e0vectex1;
+	 int e0vectex2;	//firet edge of ...
+	 int mode;
 }

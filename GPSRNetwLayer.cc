@@ -119,7 +119,8 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
 
   EV <<"in encaps...\n";
 
-  GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
+  //GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
+  GPSRPkt *pkt = new GPSRPkt( "DATA_MESSAGE", DATA_MESSAGE);
   pkt->setLength(headerLength);
     
   NetwControlInfo* cInfo = dynamic_cast<NetwControlInfo*>(msg->removeControlInfo());
@@ -133,7 +134,8 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
     netwAddr = cInfo->getNetwAddr();
     delete cInfo;
   }
-    
+
+  pkt->setMode(GREEDY_MODE);    
   pkt->setSrcAddr(myNetwAddr);
   pkt->setDestAddr(netwAddr);
   EV << " netw "<< myNetwAddr << " sending packet" <<endl;
@@ -183,42 +185,15 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
   switch(msg->kind()){
 
   case BEACON_MESSAGE:{
-    int x,y;
-    int addr;
-    addr = m->getSrcAddr();
-
-    bool find = false;
-
-    list<Node>::iterator it;
-    for(it = routeTable.begin(); it != routeTable.end(); it++){
-      if(it->addr == addr){	// 如果路由表中已经有这项则更新它
-	      it->x = x;
-	      it->y = y;
-	      it->watchDog = maxWatchDog;
-	      find = true;
-	      break;
-      }
-    }
-
-    if(!find){		// 如果没有则加入这一项
-      Node node;
-      node.addr = addr;
-      node.x = x;
-      node.y = y;
-      node.watchDog = maxWatchDog;
-      routeTable.push_back(node);
-    }
-
-    EV << "got a beacon message from address "<<m->getSrcAddr()<<endl;
-    for(it = routeTable.begin(); it != routeTable.end(); it++){
-      EV <<"host["<<it->addr<<"] ("<<it->x<<","<<it->y<<")"<<endl;
-    }
+    updateRouteTable(m);	// while beacon arrived, update the route table
     delete msg;
   }break;
-
- default:
-   sendUp(decapsMsg(m));
-}
+  case DATA_MESSAGE:{
+    routeMsg(m);
+  }break;
+  default:
+    sendUp(decapsMsg(m));	// if the message not regionised, send it up to Applcation Layer
+  }
 }
 
 /**
@@ -259,4 +234,69 @@ int GPSRNetwLayer::greedyForwarding(int destx,int desty)
     }
   }
   return nextHopAddr;
+}
+
+void GPSRNetwLayer::updateRouteTable(GPSRPkt *pkt)
+{
+    int x,y;
+    int addr;
+    addr = pkt->getSrcAddr();
+
+    x = GETX(addr);
+    y = GETY(addr);		// get the source's position
+
+    bool find = false;
+
+    list<Node>::iterator it;
+    for(it = routeTable.begin(); it != routeTable.end(); it++){
+      if(it->addr == addr){	// 如果路由表中已经有这项则更新它
+	      it->x = x;
+	      it->y = y;
+	      it->watchDog = maxWatchDog;
+	      find = true;
+	      break;
+      }
+    }
+
+    if(!find){		// 如果没有则加入这一项
+      Node node;
+      node.addr = addr;
+      node.x = x;
+      node.y = y;
+      node.watchDog = maxWatchDog;
+      routeTable.push_back(node);
+    }
+// the follow lines print the debug information of the route table
+    /*
+    EV << "got a beacon message from address "<<pkt->getSrcAddr()<<endl;
+    for(it = routeTable.begin(); it != routeTable.end(); it++){
+      EV <<"host["<<it->addr<<"] ("<<it->x<<","<<it->y<<")"<<endl;
+    }
+    */
+}
+
+void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
+{
+  int destAddr = pkt->getDestAddr();
+  int destx = GETX(destAddr);
+  int desty = GETY(destAddr);	// get the dest address and location of the packet
+
+  int mode = pkt->getMode();
+  int macAddr;
+
+  if(mode == GREEDY_MODE){
+    if(destAddr == myNetwAddr || \
+       destAddr == L3BROADCAST){ // test if i was the destiation
+      sendUp(decapsMsg(pkt));
+    }else{
+      int nHopAddr = greedyForwarding(destx,desty);
+      if(nHopAddr != myNetwAddr){ // can greedy forwarding
+	macAddr = arp->getMacAddr(nHopAddr);	// the the next hop mac addr
+	pkt->setControlInfo(new MacControlInfo(macAddr));
+	sendDown(pkt);		// send to to the next hop
+      } else {
+	//can not greedy forwarding, entering perimeter forwarding
+      }
+    }
+  }
 }

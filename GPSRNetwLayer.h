@@ -134,6 +134,12 @@ protected:
   int greedyForwarding(int x,int y);
 
   int perimerterForwarding(int x,int y);
+
+  /** @brief update the route table with the beacon message */
+  void updateRouteTable(GPSRPkt *pkt);
+
+  /** @brief route the packet to network */
+  void routeMsg(GPSRPkt *pkt);
 };
 
 #endif
