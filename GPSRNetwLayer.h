@@ -82,6 +82,8 @@ protected:
   // routing
   /** @brief Routing Table */
   std::list<Node> routeTable;
+  /** @brief Make the network planarized */
+  std::list<Node> planarizedTable;
   /** @brief beacon packet delay */
   double beaconDelay;
   /** @brief if time > beanconTime then remove the node from routing table */
@@ -140,6 +142,9 @@ protected:
 
   /** @brief route the packet to network */
   void routeMsg(GPSRPkt *pkt);
+
+  /** @bref get planarized graph from route table */
+  void planarizedGraph();
 };
 
 #endif

@@ -25,16 +25,11 @@ nn *
 #include "MacControlInfo.h"
 
 #include "GPSRPkt_m.h"
+#include "NetwAddr.h"
 
 #include <list>
 #include <math.h>
 
-#define PING_FANG(x) (x)*(x)
-#define DISTANCE(x1,y1,x2,y2) PING_FANG((x1) - (x2)) + PING_FANG((y1) - (y2))
-
-#define ADDR(x,y) ((x) << 16 | ((y)&0x0000ffff))
-#define GETX(addr) ((addr)>>16)
-#define GETY(addr) ((addr) & 0x0000ffff)
 
 using namespace std;
 
@@ -76,6 +71,7 @@ void GPSRNetwLayer::handleSelfMsg(cMessage *msg)
   case SEND_BEACON_TIMER:
     sendBeacon();
     scheduleAt(simTime() + dblrand() * beaconDelay, beaconTimer); // timer to send beacon
+    beaconDelay ++;		// increase the time delay
     //    EV << " receive a beacon from addr "<<pkt->getSrcAddr()<<endl;
     break;
   default:
@@ -265,6 +261,10 @@ void GPSRNetwLayer::updateRouteTable(GPSRPkt *pkt)
       node.y = y;
       node.watchDog = maxWatchDog;
       routeTable.push_back(node);
+
+      // insert the node to planarizedTable
+      planarizedTable.push_back(node);
+      planarizedGraph();
     }
 // the follow lines print the debug information of the route table
     /*
@@ -300,3 +300,40 @@ void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
     }
   }
 }
+
+#define NODE_DISTANCE(sta,end) DISTANCE((sta)->x,(sta)->y,(end)->x,(end)->y)
+
+void GPSRNetwLayer::planarizedGraph()
+{
+  list<Node>::iterator v;
+  list<Node>::iterator w;
+  list<Node>::iterator i;
+
+  Node self;			// the node of myself
+  self.x = x;
+  self.y = y;
+
+  // make the graph RNG
+  for(v = planarizedTable.begin(); v != planarizedTable.end(); ){
+    list<Node>::iterator tmp = v;
+    tmp ++;
+    for(w = planarizedTable.begin(); w != planarizedTable.end(); w++){
+
+      if( v == w ) continue;
+      else{
+	if(NODE_DISTANCE(&self,v) >				\
+	   max( NODE_DISTANCE(w,&self), NODE_DISTANCE(w,v)) ){
+	  //	   delete the self,v edge
+	  planarizedTable.erase(v);
+	  break;
+	}
+      }
+
+    }
+    v = tmp;
+  }
+
+  // make the graph GG
+
+}
+
