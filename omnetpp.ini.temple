@@ -30,9 +30,7 @@ module-messages = yes
 #       Parameters for the entire simulation                                 #
 ##############################################################################
 
-sim.playgroundSizeX = 500
-sim.playgroundSizeY = 500
-sim.numHosts = 8
+
 
 # uncomment to enable debug messages for all modules
 # **.debug = 0
@@ -64,35 +62,6 @@ sim.host[*].mobility.debug = 0
 # if set to 0 the MN does not move
 sim.host[*].mobility.speed          = 0
 sim.host[*].mobility.updateInterval = 0.5
-
-# starting position for the hosts "-1" means random staring point
-# starting position for the hosts "-1" means random staring point
-sim.host[0].x = 200
-sim.host[0].y = 100
-
-sim.host[1].x = 300
-sim.host[1].y = 100
-
-sim.host[2].x = 400
-sim.host[2].y = 200
-
-sim.host[3].x = 400
-sim.host[3].y = 300
-
-sim.host[4].x = 300
-sim.host[4].y = 400
-
-sim.host[5].x = 200
-sim.host[5].y = 400
-
-sim.host[6].x = 100
-sim.host[6].y = 300
-
-sim.host[7].x = 100
-sim.host[7].y = 200
-
-sim.host[*].x=-1
-sim.host[*].y=-1
 
 ##############################################################################
 #       Parameters for the Host                                              #
@@ -179,3 +148,10 @@ sim.host[*].nic.snrEval.carrierFrequency=2.4E+9
 sim.host[*].nic.snrEval.thermalNoise=-110
 sim.host[*].nic.snrEval.sensitivity=-119.5
 sim.host[*].nic.snrEval.pathLossAlpha=4
+
+
+# starting position for the hosts "-1" means random staring point
+# starting position for the hosts "-1" means random staring point
+#sim.playgroundSizeX = 500
+#sim.playgroundSizeY = 500
+
