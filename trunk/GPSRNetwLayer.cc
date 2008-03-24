@@ -30,6 +30,7 @@ nn *
 #include <list>
 #include <math.h>
 
+#define DEBUG
 
 using namespace std;
 
@@ -267,14 +268,15 @@ void GPSRNetwLayer::updateRouteTable(GPSRPkt *pkt)
       planarizedGraph();
     }
 // the follow lines print the debug information of the route table
-    /*
+#ifdef DEBUG
     EV << "got a beacon message from address "<<pkt->getSrcAddr()<<endl;
     for(it = routeTable.begin(); it != routeTable.end(); it++){
       EV <<"host["<<it->addr<<"] ("<<it->x<<","<<it->y<<")"<<endl;
     }
-    */
+#endif
 }
 
+// route the msg to the next hop
 void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
 {
   int destAddr = pkt->getDestAddr();
@@ -291,15 +293,78 @@ void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
     }else{
       int nHopAddr = greedyForwarding(destx,desty);
       if(nHopAddr != myNetwAddr){ // can greedy forwarding
-	macAddr = arp->getMacAddr(nHopAddr);	// the the next hop mac addr
-	pkt->setControlInfo(new MacControlInfo(macAddr));
-	sendDown(pkt);		// send to to the next hop
+        sendtoNextHop(pkt,nHopAddr);
       } else {
-	//can not greedy forwarding, entering perimeter forwarding
+	     //can not greedy forwarding, entering perimeter forwarding
+	     // while entering perimeter mode, we need to set something 
+	     // see the paper:)
+	     int nHopAddr = enterPerimeterMode(pkt);
+	     sendtoNextHop(pkt,nHopAddr);
       }
     }
+  } else if (mode == PERIMETER_MODE){
+    // 边界模式下
+    int nHopAddr = perimeterForwarding(destx,desty);
+    int nx = GETX(nHopAddr);
+    int ny = GETY(nHopAddr);
+
+    int lpx = GETX(pkt->getLfAddr());
+    int lpy = GETY(pkt->getLfAddr());
+
+    if(DISTANCE(nx,ny,destx,desty) <= DISTANCE(lpx,lpy,destx,desty)){
+      // 恢复greedy模式
+      pkt->setMode(GREEDY_MODE);
+    }
+    
+    sendtoNextHop(pkt,nHopAddr);
   }
 }
+
+void GPSRNetwLayer::sendtoNextHop(GPSRPkt *pkt, int nextHopAddr)
+{
+  int macAddr = arp->getMacAddr(nextHopAddr);
+  pkt->setControlInfo(new MacControlInfo(macAddr));
+  sendDown(pkt);
+}
+
+int GPSRNetwLayer::enterPerimeterMode(GPSRPkt *pkt)
+{
+  pkt->setLpAddr(myNetwAddr);
+  pkt->setLfAddr(myNetwAddr);
+  pkt->setMode(PERIMETER_MODE);
+  int destx = GETX(pkt->getDestAddr());
+  int desty = GETY(pkt->getDestAddr());
+  int nextHop = perimeterForwarding(destx,desty);
+  pkt->setE0vectex1(myNetwAddr);
+  pkt->setE0vectex2(nextHop);
+  return nextHop;
+}
+
+// 遍历平面图中与当前节点相邻的每一个节点，找到最右边的（右手法则）
+int GPSRNetwLayer::perimeterForwarding(int destx,int desty)
+{
+  list<Node>::iterator it;
+  int nextHop = -1000000;
+  int maxMul = -1000000;
+
+  int sdx = destx - x;
+  int sdy = desty - y;		// 计算自已到目的的向量
+
+  int snx,sny;			// 邻节点到自己的向量
+  for(it = planarizedTable.begin(); it != planarizedTable.end(); it ++){
+    snx = it->x - x;
+    sny = it->y - y;
+    // 计算向量的叉积,取叉积最大的
+    // 要跟向量的点积区分开来
+    int tmp = snx * sdy - sny * sdx;
+    if(tmp > maxMul){
+      maxMul = tmp;
+      nextHop = it->addr;
+    }
+  }
+  return nextHop;
+}
+
 
 #define NODE_DISTANCE(sta,end) DISTANCE((sta)->x,(sta)->y,(end)->x,(end)->y)
 

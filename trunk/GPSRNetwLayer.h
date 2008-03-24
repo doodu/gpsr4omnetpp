@@ -133,9 +133,16 @@ protected:
   /** @brief send beacon packet */
   void sendBeacon();
 
+  /** @brief 发送给下一跳 */
+  void sendtoNextHop(GPSRPkt *pkt, int nextHop);
+
   int greedyForwarding(int x,int y);
 
-  int perimerterForwarding(int x,int y);
+  /** @brief 使用右手法则在平面图中进行路由,返回下一跳的地址 */
+  int perimeterForwarding(int x, int y);
+  /** @brief 从婪贪模式进入边界模式时调用，返回下一跳的地址 */
+  int enterPerimeterMode(GPSRPkt *pkt);
+
 
   /** @brief update the route table with the beacon message */
   void updateRouteTable(GPSRPkt *pkt);
