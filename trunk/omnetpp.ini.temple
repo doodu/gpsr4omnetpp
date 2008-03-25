@@ -43,7 +43,7 @@ module-messages = yes
 sim.channelcontrol.carrierFrequency = 2.4e+9
 
 # max transmission power [mW]
-sim.channelcontrol.pMax  = 110.11 
+sim.channelcontrol.pMax  = 3
 # signal attenuation threshold [dBm]
 sim.channelcontrol.sat   = -120
 # path loss coefficient alpha
@@ -75,7 +75,7 @@ sim.host[*].applLayer="TestApplLayer"
 ##############################################################################
 
 # debug switch
-sim.host[*].appl.debug = 0
+sim.host[*].appl.debug = 1
 sim.host[*].appl.headerLength=1024
 sim.host[*].appl.burstSize=1
 
@@ -143,7 +143,7 @@ sim.host[*].nic.snrEval.debug = 0
 sim.host[*].nic.snrEval.coreDebug = 0
 sim.host[*].nic.snrEval.publishRSSIAlways = 0
 sim.host[*].nic.snrEval.headerLength=192
-sim.host[*].nic.snrEval.transmitterPower=110.11; [mW]
+sim.host[*].nic.snrEval.transmitterPower=3; [mW]
 sim.host[*].nic.snrEval.carrierFrequency=2.4E+9
 sim.host[*].nic.snrEval.thermalNoise=-110
 sim.host[*].nic.snrEval.sensitivity=-119.5
