@@ -42,55 +42,28 @@ void BlueqApplLayer::initialize(int stage)
 {
     BasicApplLayer::initialize(stage);
     if(stage == 0) {
-        if(hasPar("burstSize"))
-            burstSize = par("burstSize");
-        else
-            burstSize = 1;
-	x = par("x");
-	y = par("y");
-	if(hasPar("beaconDelay"))
-	   beaconDelay = par("beaconDelay");
-	else	
-	  beaconDelay = 10;
-
-
-	if(hasPar("maxWatchDog"))
-	  maxWatchDog = par("maxWatchDog");
-	else
-	  maxWatchDog = 10;
-        delayTimer = new cMessage( "delay-timer", SEND_BROADCAST_TIMER );
-	beaconTimer = new cMessage("beacon-timer", SEND_BEACON_TIMER);
+      testTimer = new cMessage("test-timer",TEST_TIMER_MSG);
     }
     else if(stage==1) {
-      //scheduleAt(simTime() + dblrand()*10, delayTimer);
-      scheduleAt(simTime() + dblrand()*beaconDelay, beaconTimer); // timer to send beacon
+      double timeDelay = simTime() + dblrand() * 100;
+      scheduleAt(timeDelay, testTimer); // timer to send beacon
+
     }
 }
 
 
 void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 {
+  static double timeDelay = simTime() + dblrand() * 10;
+
   switch(msg->kind())
     {
-    case SEND_BROADCAST_TIMER:
-      for(int i=0; i<burstSize; i++) {
-	sendBroadcast();
-	EV <<"send broadcast "<<i+1<<endl;
-      }
-      break;
-    case SEND_BEACON_TIMER:{
-      /*
-      GPSRPkt *pkt = new GPSRPkt("TEST_MESSAGE_XY",TEST_MESSAGE);
-    // we use the host modules index() as a appl address
-      pkt->setSrcAddr( myApplAddr() );
-      pkt->setLength(headerLength);
-
-      pkt->setControlInfo( new NetwControlInfo(L3BROADCAST) );
-      sendDown( pkt );
-      sendToXY(msg,200,100);	// send a message to 200,100 for test
-      scheduleAt(simTime() + dblrand()*beaconDelay, beaconTimer); // timer to send beacon
-      EV << "send a test message to 200,100" << endl;
-      */
+    case TEST_TIMER_MSG:{
+      cMessage *dataMsg = new cMessage("data-message", TEST_DATA_MSG);
+      sendToXY(dataMsg,100,100);
+      scheduleAt(timeDelay,testTimer);
+      EV << "test timer" << endl;
+      //delete msg;
     }break;
     default:
         EV <<" Unkown selfmessage! -> delete, kind: "<<msg->kind()<<endl;
@@ -99,40 +72,13 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 
 void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 {
-  GPSRPkt *pkt;
-  pkt = static_cast<GPSRPkt *>(msg);
   switch(msg->kind()){
-
-  case BROADCAST_MESSAGE:{
-    EV <<"got a broadcast packet from host["<<pkt->getSrcAddr()<<"], sending replay"<<endl;
-    sendReply(pkt);
-  }break;
-
-  case BROADCAST_REPLY_MESSAGE:{
-    EV <<"got a broadcast replay packet from host["<<pkt->getSrcAddr()<<"]"<<endl;
-  }break;
-
-  default:
+  TEST_DATA_MSG:
+    EV<< "recv a data message" << endl;
+    delete msg;
+   default:
     EV << "Error! got a packet with unkown kind "<<msg->kind()<<endl;
   }
-}
-
-/**
- * This function creates a new broadcast message and sends it down to
- * the network layer
- **/
-void BlueqApplLayer::sendBroadcast()
-{
-    GPSRPkt *pkt = new GPSRPkt("BROADCAST_MESSAGE", BROADCAST_MESSAGE);
-    // we use the host modules index() as a appl address
-    pkt->setSrcAddr( myApplAddr() );
-    pkt->setLength(headerLength);
-
-
-    // set the control info to tell the network layer the layer 3
-    // address;
-    pkt->setControlInfo( new NetwControlInfo(L3BROADCAST) );
-    sendDown( pkt );
 }
 
 // send message to node that who located x,y
@@ -143,16 +89,9 @@ void BlueqApplLayer::sendToXY(cMessage *msg, int x, int y)
   sendDown(msg);
 }
 
-void BlueqApplLayer::sendReply(GPSRPkt *msg) 
-{
-    double delay;
-
-    delay = uniform(0, 0.01);
-}
-
 void BlueqApplLayer::finish() 
 {
     BasicApplLayer::finish();
-    if(!delayTimer->isScheduled()) delete delayTimer;
+    //    if(!delayTimer->isScheduled()) delete delayTimer;
 }
 

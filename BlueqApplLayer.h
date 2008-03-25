@@ -39,15 +39,7 @@
  * @author BlueQ
  **/
 
-/* echo node of this network */
 
-struct Node
-{
-  int addr;
-  int x;
-  int y;
-  int watchDog;			// 当看门狗的值小于或等于0时删除结点
-};
 class BlueqApplLayer : public BasicApplLayer
 {
  public:
@@ -55,45 +47,18 @@ class BlueqApplLayer : public BasicApplLayer
   /** @brief Initialite module parameters*/
   virtual void initialize(int);
   virtual void finish();
-    enum APPL_MSG_TYPES{
-	SEND_BROADCAST_TIMER,
-	BROADCAST_MESSAGE,
-	BROADCAST_REPLY_MESSAGE,
-
-	//for routing
-	SEND_BEACON_TIMER,
-	REFALSH_ROUTE_TIMER,
-	BEACON_MESSAGE, // for location 
-	DATA_MESSAGE		  // for data
-    }; 
+  enum APPL_MSG_TYPES{
+    TEST_TIMER_MSG,
+    
+    TEST_DATA_MSG
+  }; 
 protected:
-
-  // routing
-  /** @brief Routing Table */
-  std::list<Node> routeTable;
-  /** @brief beacon packet delay */
-  double beaconDelay;
-  /** @brief if time > beanconTime then remove the node from routing table */
-  int maxWatchDog;
-  /** @bref position */
-  int x,y;
-  cMessage *beaconTimer;
-
-  /** @brief Number of messages to send in a burst*/
-  int burstSize;
-  cMessage *delayTimer;
-
- protected:
+  cMessage *testTimer;
+  
+protected:
   /** @brief Handle self messages such as timer... */
   virtual void handleSelfMsg(cMessage*);
   virtual void handleLowerMsg(cMessage*);
-  /** @brief send a broadcast packet to all connected neighbors */
-  void sendBroadcast();
-  /** @brief send a beacon packet to all connected neighbors */
-  void sendBeacon();
-  /** @brief send a reply to a broadcast message */
-  void sendReply(GPSRPkt *msg); 
-
   /** @brief send message to the node which located at x,y*/
   void sendToXY(cMessage* msg, int x, int y);
 };

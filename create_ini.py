@@ -23,13 +23,20 @@ ini_file = open("omnetpp.ini","a")
 
 lines = ["sim.playgroundSizeX=" + str(width) + "\n",
          "sim.playgroundSizeY=" + str(height) + "\n",
-         "sim.numHosts=" + str(hosts) + "\n"]
+         "sim.numHosts=" + str(hosts * 2) + "\n"]
 
 ini_file.writelines(lines)
 
 k = 0
 for i in range(rows):
     for j in range(cls):
+        x = j * 100 + random.randint(0,100)
+        y = i * 100 + random.randint(0,100) #to make the point every where
+        lines = ["sim.host[" + str(k) + "].x=" + str(x) + "\n", 
+                 "sim.host[" + str(k) + "].y=" + str(y) + "\n"]
+        ini_file.writelines(lines)
+        k = k + 1
+        # there is two node in one region
         x = j * 100 + random.randint(0,100)
         y = i * 100 + random.randint(0,100) #to make the point every where
         lines = ["sim.host[" + str(k) + "].x=" + str(x) + "\n", 

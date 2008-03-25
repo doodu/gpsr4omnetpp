@@ -46,12 +46,13 @@ void GPSRNetwLayer::initialize(int stage)
       beaconDelay = par("beaconDelay");
     else	
       beaconDelay = 10;
-    
-    
+        
     if(hasPar("maxWatchDog"))
       maxWatchDog = par("maxWatchDog");
     else
       maxWatchDog = 10;
+
+    stable = false;
     beaconTimer = new cMessage("beacon-timer", SEND_BEACON_TIMER);
   }
   else if(stage==1){
@@ -71,8 +72,12 @@ void GPSRNetwLayer::handleSelfMsg(cMessage *msg)
   switch(msg->kind()){
   case SEND_BEACON_TIMER:
     sendBeacon();
-    scheduleAt(simTime() + dblrand() * beaconDelay, beaconTimer); // timer to send beacon
-    beaconDelay ++;		// increase the time delay
+    if(count < 10){						  // when 10 times later we stop echo
+      scheduleAt(simTime() + dblrand() * beaconDelay, beaconTimer); // timer to send beacon
+      count ++;
+    }else{
+      stable = true;
+    }
     //    EV << " receive a beacon from addr "<<pkt->getSrcAddr()<<endl;
     break;
   default:
@@ -205,7 +210,12 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
  **/
 void GPSRNetwLayer::handleUpperMsg(cMessage* msg)
 {
-  sendDown(encapsMsg(msg));
+  // send down while stable
+  if(stable){
+    sendDown(encapsMsg(msg));
+  }else{
+    delete msg;
+  }
 }
 
 
@@ -386,14 +396,14 @@ void GPSRNetwLayer::planarizedGraph()
 
       if( v == w ) continue;
       else{
-	if(NODE_DISTANCE(&self,v) >				\
-	   max( NODE_DISTANCE(w,&self), NODE_DISTANCE(w,v)) ){
-	  //	   delete the self,v edge
-	  planarizedTable.erase(v);
-	  break;
-	}
+	      if(NODE_DISTANCE(&self,v) >				\
+		 max( NODE_DISTANCE(w,&self), NODE_DISTANCE(w,v)) ){
+		//	   delete the self,v edge
+		planarizedTable.erase(v);
+		break;
+	      }
       }
-
+      
     }
     v = tmp;
   }

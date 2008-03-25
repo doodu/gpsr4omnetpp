@@ -88,8 +88,12 @@ protected:
   double beaconDelay;
   /** @brief if time > beanconTime then remove the node from routing table */
   int maxWatchDog;
-  /** @bref position */
+  /** @brief position */
   int x,y;
+  /** @brief count the echo */
+  int count;
+  /** @brief if the network is stable */
+  bool stable;
   cMessage *beaconTimer;
 
   /** @brief Number of messages to send in a burst*/
