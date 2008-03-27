@@ -54,7 +54,7 @@ void BlueqApplLayer::initialize(int stage)
 
 void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 {
-  static double timeDelay = simTime() + dblrand() * 10;
+  static double timeDelay = simTime() + dblrand() * 1000;
 
   switch(msg->kind())
     {
@@ -92,6 +92,6 @@ void BlueqApplLayer::sendToXY(cMessage *msg, int x, int y)
 void BlueqApplLayer::finish() 
 {
     BasicApplLayer::finish();
-    //    if(!delayTimer->isScheduled()) delete delayTimer;
+    if(!testTimer->isScheduled()) delete testTimer;
 }
 

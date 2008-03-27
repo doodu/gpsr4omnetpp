@@ -42,6 +42,7 @@ void GPSRNetwLayer::initialize(int stage)
   if(stage == 0){
     x = par("x");
     y = par("y");
+    //    myNetwAddr = ADDR(x,y);
     if(hasPar("beaconDelay"))
       beaconDelay = par("beaconDelay");
     else	
@@ -51,14 +52,15 @@ void GPSRNetwLayer::initialize(int stage)
       maxWatchDog = par("maxWatchDog");
     else
       maxWatchDog = 10;
+    headerLength= par("headerLength");
 
     stable = false;
     beaconTimer = new cMessage("beacon-timer", SEND_BEACON_TIMER);
+    qtime.setName("response time");
   }
   else if(stage==1){
-    headerLength= par("headerLength");
     arp = SimpleArpAccess().get();
-    myNetwAddr = ADDR(x,y);
+    myNetwAddr = this->id();
     EV << " myNetwAddr " << myNetwAddr << endl;
     
     scheduleAt(simTime() + dblrand()*beaconDelay, beaconTimer); // timer to send beacon
@@ -106,6 +108,7 @@ void GPSRNetwLayer::sendBeacon()
 
   pkt->setSrcAddr(myNetwAddr);
   pkt->setDestAddr(-1);
+  pkt->setSrcLoc(LOC(x,y));
   pkt->setControlInfo( new MacControlInfo(L2BROADCAST));
   pkt->encapsulate(msg);
   sendDown(pkt);
@@ -121,8 +124,8 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
 
   EV <<"in encaps...\n";
 
-  //GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
-  GPSRPkt *pkt = new GPSRPkt( "DATA_MESSAGE", DATA_MESSAGE);
+  GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
+  //GPSRPkt *pkt = new GPSRPkt( "DATA_MESSAGE", DATA_MESSAGE);
   pkt->setLength(headerLength);
     
   NetwControlInfo* cInfo = dynamic_cast<NetwControlInfo*>(msg->removeControlInfo());
@@ -137,9 +140,13 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
     delete cInfo;
   }
 
+  // check if the packet is to self, if it is ,send to myself
   pkt->setMode(GREEDY_MODE);    
   pkt->setSrcAddr(myNetwAddr);
-  pkt->setDestAddr(netwAddr);
+  pkt->setSrcLoc(LOC(x,y));
+  pkt->setDestAddr(0);
+  pkt->setDestLoc(netwAddr);
+
   EV << " netw "<< myNetwAddr << " sending packet" <<endl;
   if(netwAddr == L3BROADCAST) {
     EV << "sendDown: nHop=L3BROADCAST -> message has to be broadcasted"
@@ -148,21 +155,27 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
   }
   else{
     EV <<"sendDown: get the MAC address\n";
-
     // 在这里路由
     int nextHopAddr; 
     int destx,desty;
     destx = GETX(netwAddr);
     desty = GETY(netwAddr);
-
+    
     nextHopAddr = greedyForwarding(destx,desty);
-    if(nextHopAddr != myNetwAddr){
-      macAddr = arp->getMacAddr(nextHopAddr); // 发往下一跳
-    }else{				      // 使用另一种路由
-      EV <<" recieve a packet that can not be forward by greedy forwarding"<<endl;
-      macAddr = L2BROADCAST;	// 广播出去
+    //nextHopAddr = myNetwAddr;
+    if(nextHopAddr == myNetwAddr){ // if can not use greedy forwarding
+      nextHopAddr = enterPerimeterMode(pkt);
     }
+
+    pkt->setDestAddr(nextHopAddr);
+
+    printf("in (%d,%d):\n",x,y);
+    printf("\tdest(%d,%d)\n",destx,desty);
+    printf("\tnext(%d)\n",nextHopAddr);
+    macAddr = arp->getMacAddr(nextHopAddr); // 发往下一跳
+    printf("\tmac(%d)\n\n",macAddr);
   }
+
   pkt->setControlInfo(new MacControlInfo(macAddr));
     
   //encapsulate the application packet
@@ -191,6 +204,11 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
     delete msg;
   }break;
   case DATA_MESSAGE:{
+    int destLoc = m->getDestLoc();
+    if(destLoc == LOC(x,y)){	// if the packet if for me, then send it up
+      sendUp(decapsMsg(m));
+      return;
+    }
     routeMsg(m);
   }break;
   default:
@@ -210,6 +228,9 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
  **/
 void GPSRNetwLayer::handleUpperMsg(cMessage* msg)
 {
+  double d = simTime()-msg->creationTime();
+  qtime.record(d);
+
   // send down while stable
   if(stable){
     sendDown(encapsMsg(msg));
@@ -231,6 +252,9 @@ int GPSRNetwLayer::greedyForwarding(int destx,int desty)
   // 否则选择离目标最近的邻居作下一跳
   // 如果路由表中的节点都比本节点距止目标远，使用另一种算法
   meToDest = DISTANCE(x,y,destx,desty);
+  if(meToDest == 0){
+    return myNetwAddr;
+  }
   minDistance = meToDest;
   for(it = routeTable.begin(); it != routeTable.end(); it ++){
     int tmpDistance;
@@ -246,11 +270,12 @@ int GPSRNetwLayer::greedyForwarding(int destx,int desty)
 void GPSRNetwLayer::updateRouteTable(GPSRPkt *pkt)
 {
     int x,y;
-    int addr;
+    int addr,loc;
     addr = pkt->getSrcAddr();
+    loc = pkt->getSrcLoc();
 
-    x = GETX(addr);
-    y = GETY(addr);		// get the source's position
+    x = GETX(loc);
+    y = GETY(loc);		// get the source's position
 
     bool find = false;
 
@@ -290,14 +315,15 @@ void GPSRNetwLayer::updateRouteTable(GPSRPkt *pkt)
 void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
 {
   int destAddr = pkt->getDestAddr();
-  int destx = GETX(destAddr);
-  int desty = GETY(destAddr);	// get the dest address and location of the packet
+  int destLoc = pkt->getDestLoc();
+  int destx = GETX(destLoc);
+  int desty = GETY(destLoc);	// get the dest address and location of the packet
 
   int mode = pkt->getMode();
   int macAddr;
 
   if(mode == GREEDY_MODE){
-    if(destAddr == myNetwAddr || \
+    if(destLoc == LOC(x,y) ||						\
        destAddr == L3BROADCAST){ // test if i was the destiation
       sendUp(decapsMsg(pkt));
     }else{
@@ -315,11 +341,16 @@ void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
   } else if (mode == PERIMETER_MODE){
     // 边界模式下
     int nHopAddr = perimeterForwarding(destx,desty);
-    int nx = GETX(nHopAddr);
-    int ny = GETY(nHopAddr);
-
-    int lpx = GETX(pkt->getLfAddr());
-    int lpy = GETY(pkt->getLfAddr());
+    int nx,ny;
+    // the following get the location of the next hop
+    for(list<Node>::iterator it = routeTable.begin(); it != routeTable.end(); it++){
+      if(it->addr == nHopAddr){
+   	nx = it->x;
+   	ny = it->y;
+      }
+    }
+    int lpx = GETX(pkt->getLpAddr());
+    int lpy = GETY(pkt->getLpAddr());
 
     if(DISTANCE(nx,ny,destx,desty) <= DISTANCE(lpx,lpy,destx,desty)){
       // 恢复greedy模式

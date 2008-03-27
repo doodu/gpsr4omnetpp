@@ -94,6 +94,10 @@ protected:
   int count;
   /** @brief if the network is stable */
   bool stable;
+
+  /** @brief record the time */
+  cOutVector qtime;
+
   cMessage *beaconTimer;
 
   /** @brief Number of messages to send in a burst*/
