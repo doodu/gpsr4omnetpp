@@ -44,7 +44,9 @@ message GPSRPkt
 	unsigned long seqNum =  0; // sequence number
 
 		 //for routing
-	 int lpAddr;	// the address where greedy forwarding failed 
+    int srcLoc;	 //the src's location 
+    int destLoc; // the location of the dest
+	 int lpAddr;	// the location where greedy forwarding failed 
 	 int lfAddr;
 
 	 int e0vectex1;
