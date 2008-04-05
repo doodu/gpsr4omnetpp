@@ -233,7 +233,11 @@ void GPSRNetwLayer::handleUpperMsg(cMessage* msg)
 
   // send down while stable
   if(stable){
-    sendDown(encapsMsg(msg));
+
+    cMessage *enmsg = encapsMsg(msg);
+    if(enmsg != NULL){	// the message is for myself
+      sendDown(enmsg);
+	}
   }else{
     delete msg;
   }
