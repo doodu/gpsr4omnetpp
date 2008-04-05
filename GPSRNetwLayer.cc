@@ -161,6 +161,12 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
     destx = GETX(netwAddr);
     desty = GETY(netwAddr);
     
+    // if the msg is for myself,then delete it
+    if(x == destx && y == desty){
+      delete msg;
+      delete pkt;
+      return NULL;
+    }
     nextHopAddr = greedyForwarding(destx,desty);
     //nextHopAddr = myNetwAddr;
     if(nextHopAddr == myNetwAddr){ // if can not use greedy forwarding
