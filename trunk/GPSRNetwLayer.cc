@@ -53,7 +53,7 @@ void GPSRNetwLayer::initialize(int stage)
     else
       maxWatchDog = 10;
     headerLength= par("headerLength");
-
+    //    printf("header length:%d\n", headerLength);
     stable = false;
     beaconTimer = new cMessage("beacon-timer", SEND_BEACON_TIMER);
     qtime.setName("response time");
@@ -127,7 +127,6 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
   GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
   //GPSRPkt *pkt = new GPSRPkt( "DATA_MESSAGE", DATA_MESSAGE);
   pkt->setLength(headerLength);
-    
   NetwControlInfo* cInfo = dynamic_cast<NetwControlInfo*>(msg->removeControlInfo());
 
   if(cInfo == 0){
@@ -178,7 +177,11 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
     printf("in (%d,%d):\n",x,y);
     printf("\tdest(%d,%d)\n",destx,desty);
     printf("\tnext(%d)\n",nextHopAddr);
-    macAddr = arp->getMacAddr(nextHopAddr); // 发往下一跳
+    //    macAddr = arp->getMacAddr(nextHopAddr); // 发往下一跳
+    // the mac layer has something strange, so send to every neighbor
+    // when the neighbor receive the packet, check the DestAddr if is his,
+    // if not then delete the packet, else routing it 
+    macAddr = L2BROADCAST;	
     printf("\tmac(%d)\n\n",macAddr);
   }
 
@@ -210,6 +213,14 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
     delete msg;
   }break;
   case DATA_MESSAGE:{
+    // check the packet if it is for me, if not then delete it
+    // do this because the mac module has something strange:(
+    int destAddr = m->getDestAddr();
+    if(destAddr != myNetwAddr){
+      delete m;
+      return;
+    }
+    // if is for me, get ready of it
     int destLoc = m->getDestLoc();
     if(destLoc == LOC(x,y)){	// if the packet if for me, then send it up
       sendUp(decapsMsg(m));
