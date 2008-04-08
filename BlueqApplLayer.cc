@@ -54,7 +54,7 @@ void BlueqApplLayer::initialize(int stage)
 
 void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 {
-  static double timeDelay = simTime() + dblrand() * 1000;
+  double timeDelay = simTime() + dblrand() * 1000;
 
   switch(msg->kind())
     {
@@ -84,8 +84,8 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 // send message to node that who located x,y
 void BlueqApplLayer::sendToXY(cMessage *msg, int x, int y)
 {
-  int destNetwAddr = NETW_ADDR(x,y);
-  msg->setControlInfo(new NetwControlInfo(destNetwAddr));
+  int destNetwLoc = LOC(x,y);
+  msg->setControlInfo(new NetwControlInfo(destNetwLoc));
   sendDown(msg);
 }
 

@@ -177,11 +177,11 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
     printf("in (%d,%d):\n",x,y);
     printf("\tdest(%d,%d)\n",destx,desty);
     printf("\tnext(%d)\n",nextHopAddr);
-    //    macAddr = arp->getMacAddr(nextHopAddr); // 发往下一跳
+    macAddr = arp->getMacAddr(nextHopAddr); // 发往下一跳
     // the mac layer has something strange, so send to every neighbor
     // when the neighbor receive the packet, check the DestAddr if is his,
     // if not then delete the packet, else routing it 
-    macAddr = L2BROADCAST;	
+    // macAddr = L2BROADCAST;	
     printf("\tmac(%d)\n\n",macAddr);
   }
 
