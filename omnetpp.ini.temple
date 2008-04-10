@@ -79,6 +79,19 @@ sim.host[*].appl.debug = 1
 sim.host[*].appl.headerLength=1024
 sim.host[*].appl.burstSize=1
 
+
+# paramters  for simulation, add by hand
+sim.host[*].appl.centerx = 500
+sim.host[*].appl.centery = 500
+# this means the start node is (startx,starty)
+sim.host[*].appl.startx = -1
+sim.host[*].appl.starty = -1
+sim.host[*].appl.endx = -1
+sim.host[*].appl.endy = -1
+# the query node
+sim.host[*].appl.queryx = -1
+sim.host[*].appl.queryy = -1
+
 ##############################################################################
 #       Parameters for the Network Layer                                     #
 ##############################################################################

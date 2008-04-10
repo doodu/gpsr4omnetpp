@@ -40,7 +40,15 @@ simple BlueqApplLayer
 	headerLength: 	numeric const, // length of the application message header (in bits)
 	burstSize: 	numeric const, // size of the burst
 	x: 	   	numeric const,
-	y:	   	numeric const;	//position
+	y:	   	numeric const,
+	centerx: 	numeric const,
+	centery:	numeric const,
+	startx:		numeric const,
+	starty: 	numeric const,
+	endx: 		numeric const,
+	endy:		numeric const,
+	queryx:		numeric const,
+	queryy:		numeric const;	//position
     gates:
 	in: lowergateIn, // from network layer
 	    lowerControlIn;
