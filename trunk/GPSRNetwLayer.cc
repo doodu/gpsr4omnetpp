@@ -174,7 +174,7 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
 
     pkt->setDestAddr(nextHopAddr);
 
-    printf("in (%d,%d):\n",x,y);
+    printf("in %d(%d,%d):\n",myNetwAddr,x,y);
     printf("\tdest(%d,%d)\n",destx,desty);
     printf("\tnext(%d)\n",nextHopAddr);
     macAddr = arp->getMacAddr(nextHopAddr); // ·¢ÍùÏÂÒ»Ìø
@@ -384,7 +384,9 @@ void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
 
 void GPSRNetwLayer::sendtoNextHop(GPSRPkt *pkt, int nextHopAddr)
 {
+  printf("in %d send to %d\n",myNetwAddr,nextHopAddr);
   int macAddr = arp->getMacAddr(nextHopAddr);
+  //MacControlInfo* cInfo = dynamic_cast<MacControlInfo*>(pkt->removeControlInfo());
   pkt->setControlInfo(new MacControlInfo(macAddr));
   sendDown(pkt);
 }

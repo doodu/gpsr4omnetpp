@@ -43,30 +43,55 @@ void BlueqApplLayer::initialize(int stage)
     BasicApplLayer::initialize(stage);
     if(stage == 0) {
       testTimer = new cMessage("test-timer",TEST_TIMER_MSG);
+
+      // get paramters
+      selfx = par("x");
+      selfy = par("y");
+
+      centerx = par("centerx");
+      centery = par("centery");
+
+      query_nodex = par("queryx");
+      query_nodey = par("queryy");
+
+      link_startx = par("startx");
+      link_starty = par("starty");
+
+      link_endx = par("endx");
+      link_endy = par("endy");
     }
     else if(stage==1) {
       double timeDelay = simTime() + dblrand() * 100;
       scheduleAt(timeDelay, testTimer); // timer to send beacon
-
     }
 }
 
 
 void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 {
-  double timeDelay = simTime() + dblrand() * 1000;
+  double timeDelay = simTime() + 1000 + dblrand() * 1000;
 
   switch(msg->kind())
     {
     case TEST_TIMER_MSG:{
+      // use to create the query links
+      if(selfx == link_startx && selfy == link_starty){
+   	cMessage *createLinkMsg = new cMessage("create-link-message",CREATE_LINK_MSG);
+   	sendToXY(createLinkMsg,link_endx,link_endy);
+   	EV<<"("<< selfx<<","<<selfy<<") send a create link message to ("
+    	  <<link_endx<<","<<link_endy<<")"<<endl;
+      }
+      /*
       cMessage *dataMsg = new cMessage("data-message", TEST_DATA_MSG);
-      sendToXY(dataMsg,100,100);
+      sendToXY(dataMsg,centerx,centery);
+      
       scheduleAt(timeDelay,testTimer);
       EV << "test timer" << endl;
       //delete msg;
+      */
     }break;
     default:
-        EV <<" Unkown selfmessage! -> delete, kind: "<<msg->kind()<<endl;
+        EV <<" Unkown self message! -> delete, kind: "<<msg->kind()<<endl;
     }
 }
 

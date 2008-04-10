@@ -50,7 +50,10 @@ class BlueqApplLayer : public BasicApplLayer
   enum APPL_MSG_TYPES{
     TEST_TIMER_MSG,
     
-    TEST_DATA_MSG
+    TEST_DATA_MSG,
+    CREATE_LINK_MSG,		// use this packet to create the test link
+    QUERY_MSG,			// the query message
+    NULL_MSG
   }; 
 protected:
   cMessage *testTimer;
