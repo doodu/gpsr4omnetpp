@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary static variable in methods
 #labels static,variable
 
 = Introduction =
