@@ -12,5 +12,6 @@ you can still use static variable in methods
 
 like this
 
-static double timeDelay = 0; 
-timeDelay = simTime() + dblrand() * 1000;
+_static double timeDelay = 0;_ 
+
+_timeDelay = simTime() + dblrand() * 1000;_
