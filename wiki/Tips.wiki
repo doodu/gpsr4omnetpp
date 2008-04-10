@@ -1,0 +1,16 @@
+#summary One-sentence summary of this page.
+#labels static,variable
+
+= Introduction =
+
+Static
+
+
+= Details =
+
+you can still use static variable in methods
+
+like this
+
+static double timeDelay = 0;
+timeDelay = simTime() + dblrand() * 1000;
