@@ -74,7 +74,7 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 {
   switch(msg->kind()){
   TEST_DATA_MSG:
-    EV<< "recv a data message" << endl;
+    EV<< "recv a data message"<< endl;
     delete msg;
    default:
     EV << "Error! got a packet with unkown kind "<<msg->kind()<<endl;
