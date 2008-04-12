@@ -29,7 +29,9 @@ neghbore2:x:y
 
 ....
 
-这是一种分节的文件格式，每一节的内容存储了一个节点的信息，各节之间用"%%\n"分割。每节的第一个字段是节点的网络层地址，后面跟的是路由表，每行存路由表中一个节点的信息，格式（netwaddr:x:y）其中netwaddr是网络层的地址，x,y是他的坐标.
+这是一种分节的文件格式(它来自于<<The Art Of Unix Programming>>，我们先择尽量简单的方式来存储数据，关于扩展性暂不考虑)，每一节的内容存储了一个节点的信息，各节之间用"%%\n"分割。每节的第一个字段是节点的网络层地址，后面跟的是路由表，每行存路由表中一个节点的信息，格式（netwaddr:x:y）其中netwaddr是网络层的地址，x,y是他的坐标.
+
+为此，我们新建了一个模块用来支持这种这文件的读写,模块对应的源文件为NetworkFile.h NetworkFile.cc
 
 
 Add your content here.  Format your content with:
