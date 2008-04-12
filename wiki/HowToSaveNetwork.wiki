@@ -11,14 +11,22 @@
 为了保存网络，我们定义了一种文件格式，如下：
 
 myNetwAddr
+
 neghbore1:x:y
+
 neghbore2:x:y
+
 ....
 
+
 %%
+
 myNetwAddr
+
 neghbore1:x:y
+
 neghbore2:x:y
+
 ....
 
 这是一种分节的文件格式，每一节的内容存储了一个节点的信息，各节之间用"%%\n"分割。每节的第一个字段是节点的网络层地址，后面跟的是路由表，每行存路由表中一个节点的信息，格式（netwaddr:x:y）其中netwaddr是网络层的地址，x,y是他的坐标.
