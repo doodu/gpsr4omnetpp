@@ -160,6 +160,10 @@ protected:
 
   /** @bref get planarized graph from route table */
   void planarizedGraph();
+
+  void saveToFile(char *fileName);
+
+  void loadFromFile(char *fileName);
 };
 
 #endif

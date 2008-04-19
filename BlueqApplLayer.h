@@ -57,7 +57,7 @@ class BlueqApplLayer : public BasicApplLayer
   }; 
 protected:
   cMessage *testTimer;
-  // the parameters form omnetpp.ini
+  // the parameters from omnetpp.ini
   int centerx,centery;		// the center node's location
   int selfx,selfy;			// the location of myself
   int link_startx,link_starty,link_endx,link_endy; // use to produce the link
