@@ -79,6 +79,7 @@ void GPSRNetwLayer::handleSelfMsg(cMessage *msg)
       count ++;
     }else{
       stable = true;
+      // save route table
     }
     //    EV << " receive a beacon from addr "<<pkt->getSrcAddr()<<endl;
     break;
@@ -382,11 +383,12 @@ void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
   }
 }
 
+
 void GPSRNetwLayer::sendtoNextHop(GPSRPkt *pkt, int nextHopAddr)
 {
-  printf("in %d send to %d\n",myNetwAddr,nextHopAddr);
   int macAddr = arp->getMacAddr(nextHopAddr);
-  //MacControlInfo* cInfo = dynamic_cast<MacControlInfo*>(pkt->removeControlInfo());
+  printf("in %d send to %d(mac %d)\n",myNetwAddr,nextHopAddr,macAddr);
+  MacControlInfo* cInfo = dynamic_cast<MacControlInfo*>(pkt->removeControlInfo());
   pkt->setControlInfo(new MacControlInfo(macAddr));
   sendDown(pkt);
 }

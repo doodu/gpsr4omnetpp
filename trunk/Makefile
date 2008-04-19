@@ -40,7 +40,7 @@ SUBDIRS=
 
 # object files in this directory
 OBJS= GPSRPkt_m.o Host_n.o Network_n.o  BlueqApplLayer_n.o BlueqApplLayer.o\
-	 GPSRNetwLayer.o GPSRNetwLayer_n.o
+	 GPSRNetwLayer.o GPSRNetwLayer_n.o NetworkFile.o
 
 # header files generated (from msg files)
 GENERATEDHEADERS= 

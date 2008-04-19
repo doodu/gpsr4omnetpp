@@ -47,4 +47,4 @@ for i in range(rows):
 
 ini_file.close()
 
-os.system("./802.11")
+#os.system("./802.11")
