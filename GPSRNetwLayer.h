@@ -29,6 +29,7 @@
 
 #include "SimpleArp.h"
 #include "GPSRPkt_m.h"
+#include "CreateLinkPkt_m.h"
 #include "SimpleAddress.h"
 #include <list>
 
@@ -60,14 +61,6 @@ class GPSRNetwLayer : public BasicLayer
     
     /** @brief cached variable of my networ address */
     int myNetwAddr;
-
-  // for routing 
-  enum GPSR_MSG_TYPES{
-    SEND_BEACON_TIMER,
-    BEACON_MESSAGE, // for location 
-    DATA_MESSAGE		  // for data
-  }; 
-
   enum DATA_MSG_MODE{
     GREEDY_MODE,		// greedy forwarding
     PERIMETER_MODE		// perimeter forwarding
@@ -156,7 +149,7 @@ protected:
   void updateRouteTable(GPSRPkt *pkt);
 
   /** @brief route the packet to network */
-  void routeMsg(GPSRPkt *pkt);
+  int routeMsg(GPSRPkt *pkt);
 
   /** @bref get planarized graph from route table */
   void planarizedGraph();

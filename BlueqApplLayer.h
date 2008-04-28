@@ -24,6 +24,7 @@
 #define BLUEQ_APPL_LAYER_H
 
 #include "GPSRPkt_m.h"
+#include "CreateLinkPkt_m.h"
 #include "BasicApplLayer.h"
 #include <list>
 /**
@@ -39,6 +40,7 @@
  * @author BlueQ
  **/
 
+struct Entry;
 
 class BlueqApplLayer : public BasicApplLayer
 {
@@ -47,21 +49,22 @@ class BlueqApplLayer : public BasicApplLayer
   /** @brief Initialite module parameters*/
   virtual void initialize(int);
   virtual void finish();
-  enum APPL_MSG_TYPES{
-    TEST_TIMER_MSG,
-    
-    TEST_DATA_MSG,
-    CREATE_LINK_MSG,		// use this packet to create the test link
-    QUERY_MSG,			// the query message
-    NULL_MSG
-  }; 
 protected:
   cMessage *testTimer;
+  cMessage *queryTimer;
   // the parameters from omnetpp.ini
   int centerx,centery;		// the center node's location
   int selfx,selfy;			// the location of myself
   int link_startx,link_starty,link_endx,link_endy; // use to produce the link
   int query_nodex,query_nodey;			   // the query node's location
+
+  // to store the link data;
+  int nextx,nexty;
+  double arrTime;
+
+  // for the center node
+  std::list<Entry> entryTable;	// store the entries of the link
+
 protected:
   /** @brief Handle self messages such as timer... */
   virtual void handleSelfMsg(cMessage*);

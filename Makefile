@@ -39,7 +39,7 @@ MSGCOPTS= $(INCLUDE_PATH)
 SUBDIRS= 
 
 # object files in this directory
-OBJS= GPSRPkt_m.o Host_n.o Network_n.o  BlueqApplLayer_n.o BlueqApplLayer.o\
+OBJS= ReplayTimePkt_m.o QueryPkt_m.o ReportEntryPkt_m.o CreateLinkPkt_m.o GPSRPkt_m.o Host_n.o Network_n.o  BlueqApplLayer_n.o BlueqApplLayer.o\
 	 GPSRNetwLayer.o GPSRNetwLayer_n.o NetworkFile.o
 
 # header files generated (from msg files)
@@ -69,36 +69,18 @@ $(EXT_DIR_TSTAMPS):
 
 subdirs: $(SUBDIRS)
 
-Host_n.o: Host_n.cc
-	$(CXX) -c $(NEDCOPTS) Host_n.cc
-Host_n.cc: Host.ned
-	$(NEDC) $(INCLUDE_PATH) Host.ned
-
-Network_n.o: Network_n.cc
-	$(CXX) -c $(NEDCOPTS) Network_n.cc
-Network_n.cc: Network.ned
-	$(NEDC) $(INCLUDE_PATH) Network.ned
-
-BlueqApplLayer_n.cc: BlueqApplLayer.ned
+%_n.o: %_n.cc
+	$(CXX) -c $(NEDCOPTS) $<
+%_n.cc: %.ned
 	$(NEDC) $(INCLUDE_PATH) $<
-BlueqApplLayer_n.o: BlueqApplLayer_n.cc
-	$(CXX) -c $(NEDCOPTS) $<
-BlueqApplLayer.o: BlueqApplLayer.cc
-	$(CXX) -c $(COPTS) $<
 
-GPSRNetwLayer_n.cc:GPSRNetwLayer.ned
-	$(NEDC) $(INCLUDE_PATH) $<
-GPSRNetwLayer_n.o: GPSRNetwLayer_n.cc
+%_m.o: %_m.cc
 	$(CXX) -c $(NEDCOPTS) $<
-GPSRNetwLayer.o: GPSRNetwLayer.cc
-	$(CXX) -c $(COPTS) $<
-
-
-GPSRPkt_m.o: GPSRPkt_m.cc
-	$(CXX) -c $(NEDCOPTS) $<
-GPSRPkt_m.cc GPSRPkt_m.h: GPSRPkt.msg
+%_m.cc %_m.h: %.msg
 	$(MSGC) $(MSGCOPTS) $<
 
+%.o: %.cc
+	$(CXX) -c $(COPTS) $< 
 GPSRNetwLayer.o: GPSRPkt_m.h
 BlueqApplLayer.o: GPSRPkt_m.h
 GPSRPkt_m.o: GPSRPkt.msg
