@@ -43,7 +43,7 @@ module-messages = yes
 sim.channelcontrol.carrierFrequency = 2.4e+9
 
 # max transmission power [mW]
-sim.channelcontrol.pMax  = 3
+sim.channelcontrol.pMax  = 4
 # signal attenuation threshold [dBm]
 sim.channelcontrol.sat   = -120
 # path loss coefficient alpha
@@ -79,18 +79,6 @@ sim.host[*].appl.debug = 1
 sim.host[*].appl.headerLength=1024
 sim.host[*].appl.burstSize=1
 
-
-# paramters  for simulation, add by hand
-sim.host[*].appl.centerx = 500
-sim.host[*].appl.centery = 500
-# this means the start node is (startx,starty)
-sim.host[*].appl.startx = -1
-sim.host[*].appl.starty = -1
-sim.host[*].appl.endx = -1
-sim.host[*].appl.endy = -1
-# the query node
-sim.host[*].appl.queryx = -1
-sim.host[*].appl.queryy = -1
 
 ##############################################################################
 #       Parameters for the Network Layer                                     #
@@ -156,23 +144,11 @@ sim.host[*].nic.snrEval.debug = 0
 sim.host[*].nic.snrEval.coreDebug = 0
 sim.host[*].nic.snrEval.publishRSSIAlways = 0
 sim.host[*].nic.snrEval.headerLength=192
-sim.host[*].nic.snrEval.transmitterPower=3; [mW]
+sim.host[*].nic.snrEval.transmitterPower=4; [mW]
 sim.host[*].nic.snrEval.carrierFrequency=2.4E+9
 sim.host[*].nic.snrEval.thermalNoise=-110
 sim.host[*].nic.snrEval.sensitivity=-119.5
 sim.host[*].nic.snrEval.pathLossAlpha=4
-
-# paramters for simulation, add by hand
-sim.host[*].appl.centerx = 500
-sim.host[*].appl.centery = 500
-# this means the start node is (startx,starty)
-sim.host[*].appl.startx = 1000
-sim.host[*].appl.starty = 0
-sim.host[*].appl.endx = 0
-sim.host[*].appl.endy = 1000
-# the query node
-sim.host[*].appl.queryx = 0
-sim.host[*].appl.queryy = 0
 
 # starting position for the hosts "-1" means random staring point
 # starting position for the hosts "-1" means random staring point

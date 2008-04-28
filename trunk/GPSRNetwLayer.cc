@@ -26,6 +26,8 @@ nn *
 
 #include "GPSRPkt_m.h"
 #include "NetwAddr.h"
+#include "NetworkFile.h" 	// for storing the network into a file
+#include "Packet.h"
 
 #include <list>
 #include <math.h>
@@ -55,7 +57,7 @@ void GPSRNetwLayer::initialize(int stage)
     headerLength= par("headerLength");
     //    printf("header length:%d\n", headerLength);
     stable = false;
-    beaconTimer = new cMessage("beacon-timer", SEND_BEACON_TIMER);
+    beaconTimer = new cMessage("beacon-timer", NET_TIMER_PACKET);
     qtime.setName("response time");
   }
   else if(stage==1){
@@ -72,14 +74,15 @@ void GPSRNetwLayer::handleSelfMsg(cMessage *msg)
 
   GPSRPkt *pkt = static_cast <GPSRPkt *> (msg);
   switch(msg->kind()){
-  case SEND_BEACON_TIMER:
+  case NET_TIMER_PACKET:
     sendBeacon();
-    if(count < 10){						  // when 10 times later we stop echo
+    if(count < 1){						  // when 10 times later we stop echo
       scheduleAt(simTime() + dblrand() * beaconDelay, beaconTimer); // timer to send beacon
       count ++;
     }else{
       stable = true;
       // save route table
+      // saveOneNode(myNetwAddr,routeTable);
     }
     //    EV << " receive a beacon from addr "<<pkt->getSrcAddr()<<endl;
     break;
@@ -102,7 +105,7 @@ cMessage* GPSRNetwLayer::decapsMsg(GPSRPkt *msg)
 void GPSRNetwLayer::sendBeacon()
 {
   cMessage *msg = new cMessage("no use message",0);
-  GPSRPkt *pkt = new GPSRPkt("BEACON_MESSAGE",BEACON_MESSAGE);
+  GPSRPkt *pkt = new GPSRPkt("NET_BEACON_MESSAGE",NET_BEACON_PACKET);
 
   pkt->setLength(headerLength);
   EV << "headerLength:"<<headerLength<<endl;
@@ -125,8 +128,14 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
 
   EV <<"in encaps...\n";
 
-  GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
-  //GPSRPkt *pkt = new GPSRPkt( "DATA_MESSAGE", DATA_MESSAGE);
+  //GPSRPkt *pkt = new GPSRPkt(msg->name(),msg->kind());
+  GPSRPkt *pkt;
+  if(msg->kind() == APPL_CREATE_LINK_PACKET){
+    pkt = new GPSRPkt( "NET_CREATE_LINK_PACKET" , NET_CREATE_LINK_PACKET);
+  }else{
+    pkt = new GPSRPkt( "NET_DATA_PACKET" , NET_DATA_PACKET);
+  }
+
   pkt->setLength(headerLength);
   NetwControlInfo* cInfo = dynamic_cast<NetwControlInfo*>(msg->removeControlInfo());
 
@@ -152,8 +161,10 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
     EV << "sendDown: nHop=L3BROADCAST -> message has to be broadcasted"
        << " -> set destMac=L2BROADCAST\n";
     macAddr = L2BROADCAST;
-  }
-  else{
+  }else if(netwAddr == LOC(x,y)){ // if the packet is self to self, send it up driectly
+    sendUp(msg);
+    return NULL;
+  }else{
     EV <<"sendDown: get the MAC address\n";
     // 在这里路由
     int nextHopAddr; 
@@ -204,16 +215,24 @@ GPSRPkt* GPSRNetwLayer::encapsMsg(cMessage *msg) {
  **/
 void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
 {
+  CreateLinkPkt *msgup,*p;
   GPSRPkt *m = static_cast<GPSRPkt *>(msg);
+  p = (CreateLinkPkt *)(msg);
+  int nextHopAddr;
+  int pktCount;
 
   EV << " handling packet from " << m->getSrcAddr() << endl;
   switch(msg->kind()){
 
-  case BEACON_MESSAGE:{
+  case NET_BEACON_PACKET:{
     updateRouteTable(m);	// while beacon arrived, update the route table
     delete msg;
   }break;
-  case DATA_MESSAGE:{
+  case NET_CREATE_LINK_PACKET:
+    pktCount = p->getCount();
+    p->setCount(pktCount + 1);
+    EV << "COUNT:" << pktCount << endl;
+  case NET_DATA_PACKET:{
     // check the packet if it is for me, if not then delete it
     // do this because the mac module has something strange:(
     int destAddr = m->getDestAddr();
@@ -223,11 +242,34 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
     }
     // if is for me, get ready of it
     int destLoc = m->getDestLoc();
-    if(destLoc == LOC(x,y)){	// if the packet if for me, then send it up
+    if(destLoc == LOC(x,y)){	// if the packet is for me, then send it up
       sendUp(decapsMsg(m));
       return;
     }
-    routeMsg(m);
+    nextHopAddr = routeMsg(m);
+    if(msg->kind() == NET_CREATE_LINK_PACKET){
+      // send a APPL_GOT_CREATE_LINK_PACKET to the application layer
+      // packet class is CreateLinkPkt, see CreateLinkPkt.msg
+      int nextx,nexty;
+      // get the next hop's x,y coordination
+      std::list<Node>::iterator it;
+      for(it = routeTable.begin(); it != routeTable.end(); it ++){
+         if(it->addr == nextHopAddr){
+  	         nextx = it->x;
+		 nexty = it->y;
+	      }
+      }
+      msgup = new CreateLinkPkt("APPL_GOT_CREATE_LINK_PACKET", APPL_GOT_CREATE_LINK_PACKET);
+      msgup->setNextx(nextx);
+      msgup->setNexty(nexty);
+      msgup->setTime(simTime());
+      if(pktCount % 3 == 0){
+	      msgup->setEntry(1);
+      }else{
+	      msgup->setEntry(0);
+      }
+      sendUp(msgup);
+    }
   }break;
   default:
     sendUp(decapsMsg(m));	// if the message not regionised, send it up to Applcation Layer
@@ -334,7 +376,8 @@ void GPSRNetwLayer::updateRouteTable(GPSRPkt *pkt)
 }
 
 // route the msg to the next hop
-void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
+// return the next hop's address
+int GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
 {
   int destAddr = pkt->getDestAddr();
   int destLoc = pkt->getDestLoc();
@@ -352,12 +395,14 @@ void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
       int nHopAddr = greedyForwarding(destx,desty);
       if(nHopAddr != myNetwAddr){ // can greedy forwarding
         sendtoNextHop(pkt,nHopAddr);
+        return nHopAddr;
       } else {
 	     //can not greedy forwarding, entering perimeter forwarding
 	     // while entering perimeter mode, we need to set something 
 	     // see the paper:)
 	     int nHopAddr = enterPerimeterMode(pkt);
 	     sendtoNextHop(pkt,nHopAddr);
+	     return nHopAddr;
       }
     }
   } else if (mode == PERIMETER_MODE){
@@ -380,6 +425,7 @@ void GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
     }
     
     sendtoNextHop(pkt,nHopAddr);
+    return nHopAddr;
   }
 }
 
@@ -390,6 +436,8 @@ void GPSRNetwLayer::sendtoNextHop(GPSRPkt *pkt, int nextHopAddr)
   printf("in %d send to %d(mac %d)\n",myNetwAddr,nextHopAddr,macAddr);
   MacControlInfo* cInfo = dynamic_cast<MacControlInfo*>(pkt->removeControlInfo());
   pkt->setControlInfo(new MacControlInfo(macAddr));
+  pkt->setDestAddr(nextHopAddr);//this is important, is dest address not reset, the next
+  //router will drop the packet, that is why packet only route twice at first
   sendDown(pkt);
 }
 
