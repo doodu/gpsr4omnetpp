@@ -76,7 +76,7 @@ void GPSRNetwLayer::handleSelfMsg(cMessage *msg)
   switch(msg->kind()){
   case NET_TIMER_PACKET:
     sendBeacon();
-    if(count < 1){						  // when 10 times later we stop echo
+    if(count < 10){						  // when 10 times later we stop echo
       scheduleAt(simTime() + dblrand() * beaconDelay, beaconTimer); // timer to send beacon
       count ++;
     }else{
@@ -386,8 +386,9 @@ int GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
 
   int mode = pkt->getMode();
   int macAddr;
-
+  printf("enter routeMsg\n ");
   if(mode == GREEDY_MODE){
+    printf("GREEDY MODE:\t");
     if(destLoc == LOC(x,y) ||						\
        destAddr == L3BROADCAST){ // test if i was the destiation
       sendUp(decapsMsg(pkt));
@@ -406,6 +407,7 @@ int GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
       }
     }
   } else if (mode == PERIMETER_MODE){
+    printf("PERIMETER MODE:\t");
     // 边界模式下
     int nHopAddr = perimeterForwarding(destx,desty);
     int nx,ny;
@@ -426,7 +428,10 @@ int GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
     
     sendtoNextHop(pkt,nHopAddr);
     return nHopAddr;
+  }else{
+    printf("wrong mode");
   }
+  return 0;
 }
 
 

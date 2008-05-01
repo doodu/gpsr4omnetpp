@@ -61,7 +61,7 @@ protected:
   // to store the link data;
   int nextx,nexty;
   double arrTime;
-
+  double start_time,end_time;
   // for the center node
   std::list<Entry> entryTable;	// store the entries of the link
 
