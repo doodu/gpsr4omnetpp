@@ -104,10 +104,32 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
     static int query_state;
     if(selfx == query_nodex && selfy == query_nodey){
       switch (query_state){
-      case 0:{
+      case 0:{			// query the start time and the end time
   	     QueryPkt *pkt = new QueryPkt( "Query-time", APPL_QUERY_PACKET);
 	     pkt->setType(QUERY_TIME);	// type = QUERY_TIME means query time
 	     pkt->setQueryAddr(LOC(selfx,selfy));
+	     sendToXY(pkt, centerx, centery);
+	     query_state = 1;
+      }break;
+      case 1:{			// generate queries and send to the center node
+	     QueryPkt *pkt = new QueryPkt( "Query-link", APPL_QUERY_PACKET);
+	     pkt->setType(QUERY_LINK);
+	     pkt->setQueryAddr(LOC(selfx,selfy));
+
+	     // generate the start_time and end_time
+	     double r1 = dblrand();
+	     double r2 = dblrand();
+	     double r3;
+	     if(r1 > r2){	// make sure r1 > r2
+	       r3 = r1;
+	       r1 = r2;
+	       r2 = r3;
+	     }
+	     double query_start_time,query_end_time;
+	     query_start_time = start_time + r1 * (end_time - start_time);
+	     query_end_time = start_time + r2 * (end_time - start_time);
+	     pkt->setStart_time(query_start_time);
+	     pkt->setEnd_time(query_end_time);
 	     sendToXY(pkt, centerx, centery);
       }break;
       default:break;
@@ -166,13 +188,13 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
     QueryPkt *pkt = (QueryPkt *) (msg);
     if(pkt->getType() == QUERY_TIME){
       ReplayTimePkt *rep = new ReplayTimePkt("replay-time", APPL_REPLAY_PACKET);
-      double start_time = entryTable.begin()->time;
-      double end_time = entryTable.begin()->time;
+      start_time = entryTable.begin()->time;
+      end_time = entryTable.begin()->time;
       int queryx,queryy;
       EV << entryTable.size() << ":" << endl;
       for(std::list<Entry>::iterator it = entryTable.begin(); it != entryTable.end(); it++){
         if(it->time > end_time){
-	       end_time == it->time;
+	       end_time = it->time;
 	     }
 	     if(it->time < start_time){
 	       start_time = it->time;
@@ -187,12 +209,26 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
       sendToXY( rep, queryx, queryy);
       EV << "get a QUERY_TIME packet, replay time:" << start_time << "," << end_time <<endl;
       delete msg;
+    }else if(pkt->getType() == QUERY_LINK){
+      int startNodeX = entryTable.begin()->x;
+      int startNodeY = entryTable.begin()->y;
+      if(selfx == centerx && selfy == centery){ // if i'am the center node, route it to the index node
+	     for(std::list<Entry>::iterator it = entryTable.begin(); it != entryTable.end(); it ++){
+	       if(it->time > pkt->getStart_time()){
+		 break;
+	       }
+	       startNodeX = it->x;
+	       startNodeY = it->y;
+	     }
+      }
+      sendToXY(pkt,startNodeX,startNodeY); // send to one of the index node of the link
+    }else{
+      EV << "recive a query packet: unknow type" << endl;
     }
   }break;
   case APPL_REPLAY_PACKET:{
     ReplayTimePkt *pkt = (ReplayTimePkt *) msg;
     if(pkt->getType() == REPLAY_TIME){
-      double start_time,end_time;
       start_time = pkt->getStart_time();
       end_time = pkt->getEnd_time();
 
@@ -209,6 +245,7 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 void BlueqApplLayer::sendToXY(cMessage *msg, int x, int y)
 {
   int destNetwLoc = LOC(x,y);
+  msg->removeControlInfo();
   msg->setControlInfo(new NetwControlInfo(destNetwLoc));
   sendDown(msg);
 }
