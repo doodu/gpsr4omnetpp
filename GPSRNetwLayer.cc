@@ -45,6 +45,7 @@ void GPSRNetwLayer::initialize(int stage)
     x = par("x");
     y = par("y");
     //    myNetwAddr = ADDR(x,y);
+    indexLength = par("indexLength");
     if(hasPar("beaconDelay"))
       beaconDelay = par("beaconDelay");
     else	
@@ -58,7 +59,6 @@ void GPSRNetwLayer::initialize(int stage)
     //    printf("header length:%d\n", headerLength);
     stable = false;
     beaconTimer = new cMessage("beacon-timer", NET_TIMER_PACKET);
-    qtime.setName("response time");
   }
   else if(stage==1){
     arp = SimpleArpAccess().get();
@@ -263,7 +263,7 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
       msgup->setNextx(nextx);
       msgup->setNexty(nexty);
       msgup->setTime(simTime());
-      if(pktCount % 3 == 0){
+      if(pktCount % indexLength == 0){
 	      msgup->setEntry(1);
       }else{
 	      msgup->setEntry(0);
@@ -288,13 +288,30 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
  **/
 void GPSRNetwLayer::handleUpperMsg(cMessage* msg)
 {
-  double d = simTime()-msg->creationTime();
-  qtime.record(d);
+
 
   // send down while stable
   if(stable){
 
-    cMessage *enmsg = encapsMsg(msg);
+    GPSRPkt *enmsg = encapsMsg(msg);
+    if(msg->kind() == APPL_CREATE_LINK_PACKET){ // the first node
+      CreateLinkPkt *msgup;
+
+      int destAddr = enmsg->getDestAddr();
+      int nextx,nexty;
+      for(std::list<Node>::iterator it = routeTable.begin(); it != routeTable.end(); it++){
+	     if(destAddr == it->addr){
+	       nextx = it->x;
+	       nexty = it->y;
+	     }
+      }
+      msgup = new CreateLinkPkt("APPL_GOT_CREATE_LINK_PACKET", APPL_GOT_CREATE_LINK_PACKET);
+      msgup->setNextx(nextx);
+      msgup->setNexty(nexty);
+      msgup->setTime(simTime());
+	   msgup->setEntry(1);
+	   sendUp(msgup);
+    }
     if(enmsg != NULL){	// the message is for myself
       sendDown(enmsg);
 	}
@@ -315,6 +332,7 @@ int GPSRNetwLayer::greedyForwarding(int destx,int desty)
   // 如果目标在路由表中，直接发送
   // 否则选择离目标最近的邻居作下一跳
   // 如果路由表中的节点都比本节点距止目标远，使用另一种算法
+
   meToDest = DISTANCE(x,y,destx,desty);
   if(meToDest == 0){
     return myNetwAddr;
@@ -327,6 +345,8 @@ int GPSRNetwLayer::greedyForwarding(int destx,int desty)
       minDistance = tmpDistance;
       nextHopAddr = it->addr;
     }
+    //printf("route:%d(%d,%d)\n",nextHopAddr,it->x,it->y);
+    //x7fflush(stdout);
   }
   return nextHopAddr;
 }
@@ -386,9 +406,9 @@ int GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
 
   int mode = pkt->getMode();
   int macAddr;
-  printf("enter routeMsg\n ");
+
   if(mode == GREEDY_MODE){
-    printf("GREEDY MODE:\t");
+    printf("CREEDY MODE:");
     if(destLoc == LOC(x,y) ||						\
        destAddr == L3BROADCAST){ // test if i was the destiation
       sendUp(decapsMsg(pkt));
@@ -407,7 +427,7 @@ int GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
       }
     }
   } else if (mode == PERIMETER_MODE){
-    printf("PERIMETER MODE:\t");
+    printf("PERIMETER MODE:");
     // 边界模式下
     int nHopAddr = perimeterForwarding(destx,desty);
     int nx,ny;
@@ -438,6 +458,7 @@ int GPSRNetwLayer::routeMsg(GPSRPkt *pkt)
 void GPSRNetwLayer::sendtoNextHop(GPSRPkt *pkt, int nextHopAddr)
 {
   int macAddr = arp->getMacAddr(nextHopAddr);
+  qtime.record(1);		// record one times for packet routeing
   printf("in %d send to %d(mac %d)\n",myNetwAddr,nextHopAddr,macAddr);
   MacControlInfo* cInfo = dynamic_cast<MacControlInfo*>(pkt->removeControlInfo());
   pkt->setControlInfo(new MacControlInfo(macAddr));

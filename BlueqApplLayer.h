@@ -65,12 +65,15 @@ protected:
   // for the center node
   std::list<Entry> entryTable;	// store the entries of the link
 
+  // for data recording
+  cOutVector qtime;
 protected:
   /** @brief Handle self messages such as timer... */
   virtual void handleSelfMsg(cMessage*);
   virtual void handleLowerMsg(cMessage*);
   /** @brief send message to the node which located at x,y*/
   void sendToXY(cMessage* msg, int x, int y);
+  void sendEntryReport(double time);
 };
 
 #endif
