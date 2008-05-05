@@ -34,6 +34,10 @@ struct Entry{
   double time;
 };
 
+bool entry_comp(Entry &e1, Entry &e2){
+  if(e1.time > e2.time) return false;
+  else return true;
+}
 Define_Module(BlueqApplLayer);
 
 
@@ -45,6 +49,12 @@ Define_Module(BlueqApplLayer);
  * message
  *
  **/
+
+#define IS_LINK_START_NODE (selfx == link_startx && selfy == link_starty)
+#define IS_LINK_END_NODE (selfx == link_endx && selfy == link_endy)
+#define IS_CENTER_NODE (selfx = centerx && selfy == centery)
+#define IS_QUERY_NODE (selfx = query_nodex && selfy  == query_nodey)
+
 void BlueqApplLayer::initialize(int stage)
 {
     BasicApplLayer::initialize(stage);
@@ -84,12 +94,12 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
   case APPL_TEST_TIMER:{
     // use to create the query links
     // printf("start:(%d,%d)\nmy:(%d,%d)\n",link_startx,link_starty,selfx,selfy);
-    if(selfx == link_startx && selfy == link_starty){
+    if(IS_LINK_START_NODE){
       CreateLinkPkt *createLinkMsg = new CreateLinkPkt("CreateLinkPkt",APPL_CREATE_LINK_PACKET);
       //createLinkMsg->setLength(1024);
       sendToXY(createLinkMsg,link_endx,link_endy);
-      EV<<"("<< selfx<<","<<selfy<<") send a create link message to ("
-	<<link_endx<<","<<link_endy<<")"<<endl;
+      sendEntryReport(simTime());
+      EV<<"("<< selfx<<","<<selfy<<") send a create link message to ("<<link_endx<<","<<link_endy<<")"<<endl;
     }
     /*
       cMessage *dataMsg = new cMessage("data-message", TEST_DATA_MSG);
@@ -113,13 +123,15 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
       }break;
       case 1:{			// generate queries and send to the center node
 	     QueryPkt *pkt = new QueryPkt( "Query-link", APPL_QUERY_PACKET);
-	     pkt->setType(QUERY_LINK);
+	     pkt->setType(QUERY_LINK_TO_CENTER);
 	     pkt->setQueryAddr(LOC(selfx,selfy));
 
 	     // generate the start_time and end_time
-	     double r1 = dblrand();
-	     double r2 = dblrand();
+	     double r1;
+	     double r2;
 	     double r3;
+	     r1 = dblrand();
+	     r2 = dblrand();
 	     if(r1 > r2){	// make sure r1 > r2
 	       r3 = r1;
 	       r1 = r2;
@@ -131,10 +143,15 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 	     pkt->setStart_time(query_start_time);
 	     pkt->setEnd_time(query_end_time);
 	     sendToXY(pkt, centerx, centery);
+
       }break;
       default:break;
       }
-      scheduleAt(simTime() + 100, queryTimer);
+      static int count = 0;
+      if(count < 100){		// create 1000 query
+	     scheduleAt(simTime() + 100, queryTimer);
+	     count ++;
+      }
     }
 
   }break;
@@ -145,13 +162,17 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 
 void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 {
-
   switch(msg->kind()){
     
   case APPL_DATA_PACKET:
     EV<< "recv a data message"<< endl;
     delete msg;
     break;
+  case APPL_CREATE_LINK_PACKET:{
+    nextx = selfx;
+    nexty = selfy;
+    arrTime = simTime();
+  }break;
   case APPL_GOT_CREATE_LINK_PACKET:{
     EV << "in the link: " << selfx << "," << selfy << endl;
     CreateLinkPkt *pkt = (CreateLinkPkt *) msg;
@@ -159,12 +180,7 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
     nexty = pkt->getNexty();
     arrTime = pkt->getTime();
     if(pkt->getEntry() != 0){
-      //report entry, create a APPL_REPORT_PACKET,and send it to (centerx,centery)
-      ReportEntryPkt *pkt = new ReportEntryPkt("APPL_REPORT_PACKET",APPL_REPORT_PACKET);
-      pkt->setX(selfx);
-      pkt->setY(selfy);
-      pkt->setTime(arrTime);
-      sendToXY(pkt,centerx,centery);
+      sendEntryReport(arrTime);
     }
     EV << "\tnext:" << nextx << "," << nexty << endl;
     EV << "\ttime:" << arrTime << endl;
@@ -180,6 +196,7 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
     entryTable.push_back(entry);
 
     std::list<Entry>::iterator it;
+    entryTable.sort(entry_comp);
     for(it = entryTable.begin(); it != entryTable.end(); it ++){
       EV << "entry:(" << it->x << "," << it->y << "," << it->time << ")" << endl;
     }
@@ -209,10 +226,10 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
       sendToXY( rep, queryx, queryy);
       EV << "get a QUERY_TIME packet, replay time:" << start_time << "," << end_time <<endl;
       delete msg;
-    }else if(pkt->getType() == QUERY_LINK){
+    }else if(pkt->getType() == QUERY_LINK_TO_CENTER){
       int startNodeX = entryTable.begin()->x;
       int startNodeY = entryTable.begin()->y;
-      if(selfx == centerx && selfy == centery){ // if i'am the center node, route it to the index node
+      if(IS_CENTER_NODE){ // if i'am the center node, route it to the index node
 	     for(std::list<Entry>::iterator it = entryTable.begin(); it != entryTable.end(); it ++){
 	       if(it->time > pkt->getStart_time()){
 		 break;
@@ -220,8 +237,35 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
 	       startNodeX = it->x;
 	       startNodeY = it->y;
 	     }
+	     pkt->setType(QUERY_LINK);
+	     sendToXY(pkt,startNodeX,startNodeY); // send to one of 
       }
-      sendToXY(pkt,startNodeX,startNodeY); // send to one of the index node of the link
+    }else if(pkt->getType() == QUERY_LINK){
+       if(arrTime < pkt->getStart_time()){
+	     sendToXY(pkt, nextx, nexty);
+      }else if(arrTime >= pkt->getStart_time() && arrTime <= pkt->getEnd_time()){ // add to the dest_link
+	     int arrSize;
+	     arrSize = pkt->getDest_linkArraySize();
+	     pkt->setDest_linkArraySize(arrSize + 1);
+	     pkt->setDest_link(arrSize, LOC(selfx,selfy));
+	     sendToXY(pkt, nextx, nexty);
+      }else if (arrTime >= pkt->getEnd_time()){
+	     int queryAddr = pkt->getQueryAddr();
+	     pkt->setType(QUERY_REPLAY);
+	     sendToXY(pkt, GETX(queryAddr), GETY(queryAddr));
+      }else{
+	     delete pkt;
+      }
+      EV << "QUERY LINK:"<< pkt->getStart_time() << "--" << pkt->getEnd_time() << endl;
+    }else if(pkt->getType() == QUERY_REPLAY){
+      double d = simTime()-pkt->creationTime();
+      qtime.record(d);
+      int len = pkt->getDest_linkArraySize();
+      EV << "QUERY_REPLAY:"<<endl;
+      for(int i = 0; i<len; i++){
+	     int loc = pkt->getDest_link(i);
+	     EV << GETX(loc) << "," << GETY(loc) <<endl;
+      }
     }else{
       EV << "recive a query packet: unknow type" << endl;
     }
@@ -250,6 +294,15 @@ void BlueqApplLayer::sendToXY(cMessage *msg, int x, int y)
   sendDown(msg);
 }
 
+void BlueqApplLayer::sendEntryReport(double time)
+{
+  //report entry, create a APPL_REPORT_PACKET,and send it to (centerx,centery)
+  ReportEntryPkt *pkt = new ReportEntryPkt("APPL_REPORT_PACKET",APPL_REPORT_PACKET);
+  pkt->setX(selfx);
+  pkt->setY(selfy);
+  pkt->setTime(time);
+  sendToXY(pkt,centerx,centery);
+}
 void BlueqApplLayer::finish() 
 {
     BasicApplLayer::finish();

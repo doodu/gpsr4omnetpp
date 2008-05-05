@@ -89,14 +89,17 @@ protected:
   bool stable;
 
   /** @brief record the time */
-  cOutVector qtime;
+
 
   cMessage *beaconTimer;
 
   /** @brief Number of messages to send in a burst*/
   int burstSize;
   cMessage *delayTimer;
-    
+  int indexLength;
+
+  // for data recording
+  cOutVector qtime;    
   protected:
     /** 
      * @name Handle Messages

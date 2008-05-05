@@ -43,9 +43,10 @@ module-messages = yes
 sim.channelcontrol.carrierFrequency = 2.4e+9
 
 # max transmission power [mW]
-sim.channelcontrol.pMax  = 4
+sim.channelcontrol.pMax  = 2
 # signal attenuation threshold [dBm]
 sim.channelcontrol.sat   = -120
+
 # path loss coefficient alpha
 sim.channelcontrol.alpha = 4
 sim.channelcontrol.sendDirect = 0
@@ -144,13 +145,19 @@ sim.host[*].nic.snrEval.debug = 0
 sim.host[*].nic.snrEval.coreDebug = 0
 sim.host[*].nic.snrEval.publishRSSIAlways = 0
 sim.host[*].nic.snrEval.headerLength=192
-sim.host[*].nic.snrEval.transmitterPower=4; [mW]
-sim.host[*].nic.snrEval.carrierFrequency=2.4E+9
-sim.host[*].nic.snrEval.thermalNoise=-110
+sim.host[*].nic.snrEval.transmitterPower=2; [mW]
+sim.host[*].nic.snrEval.carrierFrequency=2.4e+9
+#sim.host[*].nic.snrEval.thermalNoise=-110
+sim.host[*].nic.snrEval.thermalNoise=-1100
 sim.host[*].nic.snrEval.sensitivity=-119.5
 sim.host[*].nic.snrEval.pathLossAlpha=4
 
-# starting position for the hosts "-1" means random staring point
+##############################################################################
+#       Parameters the simulation                                         #
+##############################################################################
+sim.host[*].net.indexLength = 5
+#sim.host[*].appl.averageQueryLength = 5  # parameter not use now
+
 # starting position for the hosts "-1" means random staring point
 #sim.playgroundSizeX = 500
 #sim.playgroundSizeY = 500
