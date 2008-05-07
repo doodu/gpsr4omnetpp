@@ -2,7 +2,7 @@
 ;ini-warnings = true
 network = sim
 #random-seed = 13
-sim-time-limit = 5000s
+sim-time-limit = 5000m
 
 [Tkenv]
 bitmap-path="../../bitmaps"
@@ -155,7 +155,7 @@ sim.host[*].nic.snrEval.pathLossAlpha=4
 ##############################################################################
 #       Parameters the simulation                                         #
 ##############################################################################
-sim.host[*].net.indexLength = 5
+# sim.host[*].net.indexLength = 5
 #sim.host[*].appl.averageQueryLength = 5  # parameter not use now
 
 # starting position for the hosts "-1" means random staring point

@@ -98,7 +98,6 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
       CreateLinkPkt *createLinkMsg = new CreateLinkPkt("CreateLinkPkt",APPL_CREATE_LINK_PACKET);
       //createLinkMsg->setLength(1024);
       sendToXY(createLinkMsg,link_endx,link_endy);
-      sendEntryReport(simTime());
       EV<<"("<< selfx<<","<<selfy<<") send a create link message to ("<<link_endx<<","<<link_endy<<")"<<endl;
     }
     /*
@@ -172,6 +171,9 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
     nextx = selfx;
     nexty = selfy;
     arrTime = simTime();
+    if(IS_LINK_END_NODE){
+      sendEntryReport(arrTime);
+    }
   }break;
   case APPL_GOT_CREATE_LINK_PACKET:{
     EV << "in the link: " << selfx << "," << selfy << endl;
