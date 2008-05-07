@@ -92,11 +92,15 @@ protected:
 
 
   cMessage *beaconTimer;
-
+  cMessage *deadTimer;
   /** @brief Number of messages to send in a burst*/
   int burstSize;
   cMessage *delayTimer;
+
+  bool dead;			// if the host is workable
+  // parameters for simulation
   int indexLength;
+  double deadProbablity;
 
   // for data recording
   cOutVector qtime;    

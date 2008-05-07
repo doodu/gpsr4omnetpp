@@ -46,6 +46,7 @@ void GPSRNetwLayer::initialize(int stage)
     y = par("y");
     //    myNetwAddr = ADDR(x,y);
     indexLength = par("indexLength");
+    deadProbablity = par("deadProbablity");
     if(hasPar("beaconDelay"))
       beaconDelay = par("beaconDelay");
     else	
@@ -58,7 +59,9 @@ void GPSRNetwLayer::initialize(int stage)
     headerLength= par("headerLength");
     //    printf("header length:%d\n", headerLength);
     stable = false;
+    dead = true;
     beaconTimer = new cMessage("beacon-timer", NET_TIMER_PACKET);
+    deadTimer = new cMessage("dead-timer", NET_DEAD_TIMER_PACKET);
   }
   else if(stage==1){
     arp = SimpleArpAccess().get();
@@ -66,6 +69,7 @@ void GPSRNetwLayer::initialize(int stage)
     EV << " myNetwAddr " << myNetwAddr << endl;
     
     scheduleAt(simTime() + dblrand()*beaconDelay, beaconTimer); // timer to send beacon
+    scheduleAt(simTime() + 100,deadTimer);
   }
 }
 
@@ -73,6 +77,11 @@ void GPSRNetwLayer::handleSelfMsg(cMessage *msg)
 {
 
   GPSRPkt *pkt = static_cast <GPSRPkt *> (msg);
+
+  if(dead){
+    delete msg;
+    return;
+  }
   switch(msg->kind()){
   case NET_TIMER_PACKET:
     sendBeacon();
@@ -86,6 +95,13 @@ void GPSRNetwLayer::handleSelfMsg(cMessage *msg)
     }
     //    EV << " receive a beacon from addr "<<pkt->getSrcAddr()<<endl;
     break;
+  case NET_DEAD_TIMER_PACKET:{
+    double d = dblrand();
+    if(d < deadProbablity) {
+      dead = true;
+    }
+    scheduleAt(simTime() + 100, deadTimer);
+  }break;
   default:
     EV <<" Unkown selfmessage! -> delete, kind: "<<msg->kind()<<endl;
   }
@@ -221,6 +237,10 @@ void GPSRNetwLayer::handleLowerMsg(cMessage* msg)
   int nextHopAddr;
   int pktCount;
 
+  if(dead){
+    delete msg;
+    return;
+  }
   EV << " handling packet from " << m->getSrcAddr() << endl;
   switch(msg->kind()){
 
@@ -291,6 +311,10 @@ void GPSRNetwLayer::handleUpperMsg(cMessage* msg)
 
 
   // send down while stable
+  if(dead){
+    delete msg;
+    return;
+  }
   if(stable){
 
     GPSRPkt *enmsg = encapsMsg(msg);

@@ -5,12 +5,13 @@ import sys
 import random
 
 
-if len(sys.argv) != 3:
-    print "Usage:" + sys.argv[0] + " [rows] [cloums]"
+if len(sys.argv) != 4:
+    print "Usage:" + sys.argv[0] + " [rows] [cloums] [index_length]"
     sys.exit(-1)
 
 rows = int(sys.argv[1])
 cls = int(sys.argv[2])
+index_length = sys.argv[3]
 
 width = cls*100        # the width of the canvas
 height = rows*100       # the height of the canvas
@@ -20,6 +21,10 @@ hosts = rows * cls        # how many host
 os.system('cp -f omnetpp.ini.temple omnetpp.ini')
 
 ini_file = open("omnetpp.ini","a")
+
+lines = ["sim.host[*].net.indexLength=" + index_length + "\n"]
+
+ini_file.writelines(lines)
 
 lines = ["sim.playgroundSizeX=" + str(width) + "\n",
          "sim.playgroundSizeY=" + str(height) + "\n",
