@@ -5,13 +5,14 @@ import sys
 import random
 
 
-if len(sys.argv) != 4:
-    print "Usage:" + sys.argv[0] + " [rows] [cloums] [index_length]"
+if len(sys.argv) != 5:
+    print "Usage:" + sys.argv[0] + " [rows] [cloums] [index_length] [dead_probablity]"
     sys.exit(-1)
 
 rows = int(sys.argv[1])
 cls = int(sys.argv[2])
 index_length = sys.argv[3]
+dead_probablity = sys.argv[4]
 
 width = cls*100        # the width of the canvas
 height = rows*100       # the height of the canvas
@@ -22,7 +23,8 @@ os.system('cp -f omnetpp.ini.temple omnetpp.ini')
 
 ini_file = open("omnetpp.ini","a")
 
-lines = ["sim.host[*].net.indexLength=" + index_length + "\n"]
+lines = ["sim.host[*].net.indexLength=" + index_length + "\n",
+         "sim.host[*].net.deadProbablity=" + dead_probablity + "\n"]
 
 ini_file.writelines(lines)
 

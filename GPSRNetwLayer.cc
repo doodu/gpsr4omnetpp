@@ -59,7 +59,7 @@ void GPSRNetwLayer::initialize(int stage)
     headerLength= par("headerLength");
     //    printf("header length:%d\n", headerLength);
     stable = false;
-    dead = true;
+    dead = false;
     beaconTimer = new cMessage("beacon-timer", NET_TIMER_PACKET);
     deadTimer = new cMessage("dead-timer", NET_DEAD_TIMER_PACKET);
   }
