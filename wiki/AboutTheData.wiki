@@ -1,0 +1,17 @@
+#summary One-sentence summary of this page.
+#labels Phase-Design,Featured
+
+= Introduction =
+
+模拟的数据最终在omnetpp.vec中，在这里面，我们要提取下面几个数据:
+1.查询成功率
+2.查询延迟
+3。数据包转发次数
+
+我们写了一个专门的脚本来做上面的事情，文件名为data_process.py
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
