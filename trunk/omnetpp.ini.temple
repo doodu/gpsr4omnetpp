@@ -157,6 +157,7 @@ sim.host[*].nic.snrEval.pathLossAlpha=4
 ##############################################################################
 # sim.host[*].net.indexLength = 5
 #sim.host[*].appl.averageQueryLength = 5  # parameter not use now
+#sim.host[*].net.deadProbablity = 0.014
 
 # starting position for the hosts "-1" means random staring point
 #sim.playgroundSizeX = 500

@@ -36,6 +36,7 @@ simple GPSRNetwLayer
 	debug : numeric const, // debug switch for the core framework
 	headerLength : numeric const, // length of the network packet header (in bits)
 	indexLength: numeric const,   // how many nodes between link index nodes
+	deadProbablity: numeric const,
 
 	x:	     numeric const,
 	y:	     numeric const; //position
