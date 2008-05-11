@@ -1,9 +1,9 @@
-#summary One-sentence summary of this page.
 #labels Phase-Implementation
+#A small and usefully script
 
 = Introduction =
 
-a little script to make project run, and get the running data. the parameters just like create_ini.py. After running, the data is store to omnetpp.data, including results and patameters
+a small script to make project run, and get the running data. the parameters just like create_ini.py. After running, the data is store to omnetpp.data, including results and parameters
 
 
 = Details =
