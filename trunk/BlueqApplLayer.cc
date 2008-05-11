@@ -142,7 +142,7 @@ void BlueqApplLayer::handleSelfMsg(cMessage *msg)
 	     pkt->setStart_time(query_start_time);
 	     pkt->setEnd_time(query_end_time);
 	     sendToXY(pkt, centerx, centery);
-
+	     qtime.record(QUERY_LINK_TO_CENTER);
       }break;
       default:break;
       }
@@ -262,6 +262,7 @@ void BlueqApplLayer::handleLowerMsg(cMessage *msg)
     }else if(pkt->getType() == QUERY_REPLAY){
       double d = simTime()-pkt->creationTime();
       qtime.record(d);
+      qtime.record(QUERY_REPLAY);
       int len = pkt->getDest_linkArraySize();
       EV << "QUERY_REPLAY:"<<endl;
       for(int i = 0; i<len; i++){
