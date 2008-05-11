@@ -1,5 +1,5 @@
 #labels Phase-Implementation
-#A small and usefully script
+A small and usefully script
 
 = Introduction =
 
